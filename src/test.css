@@ -1,0 +1,22 @@
+html, body {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    text-align: center;
+    background-color: #223;
+}
+
+:fullscreen {
+    background-color: hotpink;
+}
+
+canvas {
+    /*cursor: none;*/
+    /*border: 1px solid #555;
+    background-color: #fff;*/
+    height: 100vh;
+    max-width: 100vw;
+}

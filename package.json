@@ -1,0 +1,36 @@
+{
+  "name": "pnc",
+  "version": "0.1.0",
+  "description": "PNC - Point 'N Click",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "aqa",
+    "run-dev": "parcel src/test.html --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Wiiseguy/pnc.git"
+  },
+  "keywords": [
+    "pnc",
+    "point",
+    "click",
+    "adventure",
+    "game"
+  ],
+  "author": "Wiiseguy",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Wiiseguy/pnc/issues"
+  },
+  "homepage": "https://github.com/Wiiseguy/pnc#readme",
+  "devDependencies": {
+    "aqa": "^1.3.1"
+  },
+  "dependencies": {
+    "parcel": "^2.4.1"
+  }
+}
