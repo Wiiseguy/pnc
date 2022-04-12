@@ -1,4 +1,5 @@
 import * as PNC from './engine';
+import p5 from "p5";
 
 NAME("James Bond's Amazing Adventure!")
 AUTHOR("Chronic & Wiiseguy")
@@ -29,12 +30,58 @@ var hasGateKey = false
 var HGateLocked = true
 
 
-
 // Animations
 ANIMATION("iBatFlap", "iBatStrip", 200, [
 	[0, 0, 24, 19],
 	[25, 0, 49, 19],
 ])
+
+
+
+const p5Instance = new p5(s => {
+	let canvas;
+	let x = 0;
+	let y = 0;
+	let c = 200;
+	let m = false;
+
+	console.log(s)
+
+	s.setup = () => {
+		canvas = s.createCanvas(640, 480);
+		y = canvas.height / 2;
+
+		canvas.mousePressed(doMouseP);
+		canvas.mouseReleased(doMouseR);
+		canvas.mouseWheel(doMouseWheel);
+		s.background(0)
+	};
+
+	s.draw = () => {
+		s.noStroke()
+
+		if (m == true) {
+			s.circle(s.mouseX, s.mouseY, c)
+			s.fill(Math.random() * 255, Math.random() * 255, Math.random() * 255)
+		}
+
+	};
+
+	function doMouseP() {
+		m = true;
+	}
+
+	function doMouseR() {
+		m = false;
+	}
+
+	function doMouseWheel(wheel) {
+		c += wheel.deltaY / 20;
+		c = s.constrain(c, 1, 1000);
+	}
+
+});
+
 
 
 
@@ -78,5 +125,4 @@ ROOM("firstRoom", () => {
 		// etc.
 		SHOWTEXT("FUCK!!!")
 	}
-
 })
