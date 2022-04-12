@@ -9,5 +9,7 @@ The goal of this iteration is to make the syntax as close to the original as pos
 
 
 ### Getting started
-`npm run run-dev`
+1. Install Node and VS Code
+2. Clone this repo
+3. `npm run run-dev`
 or run `run-dev` from Task Explorer > pnc > npm.
