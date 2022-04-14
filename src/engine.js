@@ -8,6 +8,7 @@ class CustomContext {
     p5 = null;
     /** @type {p5.Renderer} */
     canvas = null;
+    /** @type {p5.GameInfo} */
     gameInfo = null;
     constructor(c) {
         this.p5 = c.p5;
@@ -16,34 +17,38 @@ class CustomContext {
     }
 }
 
-const g_GameInfo = {
-    version: 1,
-    name: "",
+class GameInfo {
+    version = 1;
+    name = "";
     /** @type {number[]} */
-    authors: [],
-    copyright: "",
-    dateCreated: "",
-    dateModified: "",    
-    description: "",
-    width: 640,
-    height: 480,
-    fontSize: 16,
+    authors = [];
+    copyright = "";
+    dateCreated = "";
+    dateModified = "";    
+    description = "";
+    width = 640;
+    height = 480;
+    fontSize = 16;
     /** @type {p5.Color} */
-    bgColor: "#000000",
-    skipIntro: false,
-    startRoom: "",
-    rooms: [],
-    actors: [],
-    images: [],
-    sounds: [],
-    animations: [],
+    bgColor = "#000000";
+    skipIntro = false;
+    startRoom = "";
+    rooms = [];
+    actors = [];
+    images = [];
+    sounds = [];
+    animations = [];
 
-    customInit: [],
-    customDraw: []
+    customInit = [];
+    customDraw = [];
+
+    constructor() {
+        
+    }
 }
 
-let currentRoomDef = null
-let currentActorDef = null
+const g_GameInfo = new GameInfo();
+
 
 globalThis.NAME = function (name) {
     g_GameInfo.name = name;

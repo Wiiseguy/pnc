@@ -88,6 +88,7 @@ let m = false;
 
 CUSTOM_INIT(ctx => {
     let { p5, canvas } = ctx;
+    
     canvas.mousePressed(e => {
         m = true;
     });
