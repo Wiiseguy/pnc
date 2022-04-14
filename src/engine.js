@@ -24,7 +24,7 @@ class GameInfo {
     authors = [];
     copyright = "";
     dateCreated = "";
-    dateModified = "";    
+    dateModified = "";
     description = "";
     width = 640;
     height = 480;
@@ -43,7 +43,7 @@ class GameInfo {
     customDraw = [];
 
     constructor() {
-        
+
     }
 }
 
@@ -63,7 +63,7 @@ globalThis.AUTHOR = function (name) {
  * @param {number} width 
  * @param {number} height 
  */
-globalThis.SIZE = function(width, height) {
+globalThis.SIZE = function (width, height) {
     g_GameInfo.width = width
     g_GameInfo.height = height
 }
@@ -133,13 +133,13 @@ globalThis.CUSTOM_INIT = function (fn) {
  * 
  * @param {function(CustomContext)} fn 
  */
-globalThis.CUSTOM_DRAW = function(fn) {
+globalThis.CUSTOM_DRAW = function (fn) {
     g_GameInfo.customDraw.push(fn)
 }
 
 function initialize() {
-    console.log("GameInfo:", g_GameInfo)    
-    
+    console.log("GameInfo:", g_GameInfo)
+
     const canvas = P5.createCanvas(g_GameInfo.width, g_GameInfo.height);
 
     const context = new CustomContext({
@@ -148,16 +148,20 @@ function initialize() {
         canvas
     })
 
-    P5.background("#000000") 
+    P5.background("#000000")
     P5.stroke(0)
     P5.fill("#eeeeee")
     P5.textSize(g_GameInfo.fontSize);
     P5.textAlign(P5.CENTER, P5.CENTER);
-    P5.text(g_GameInfo.name, 0, 0, g_GameInfo.width, g_GameInfo.height, "center", "center")
-    P5.textSize(g_GameInfo.fontSize*0.75);
-    P5.text("by " + g_GameInfo.authors.join(" & "), 0, g_GameInfo.fontSize, g_GameInfo.width, g_GameInfo.height)
-    P5.textSize(g_GameInfo.fontSize);
-    
+
+    // Draw the Game title and author(s) unless NOINTRO() is used.
+    if (!g_GameInfo.skipIntro) {
+        P5.text(g_GameInfo.name, 0, 0, g_GameInfo.width, g_GameInfo.height, "center", "center")
+        P5.textSize(g_GameInfo.fontSize * 0.75);
+        if (g_GameInfo.authors != "") P5.text("by " + g_GameInfo.authors.join(" & "), 0, g_GameInfo.fontSize, g_GameInfo.width, g_GameInfo.height)
+        P5.textSize(g_GameInfo.fontSize);
+    }
+
     // Call custom init functions
     g_GameInfo.customInit.forEach(fn => {
         fn(context)
