@@ -32,91 +32,94 @@ var HGateLocked = true
 
 // Animations
 ANIMATION("iBatFlap", "iBatStrip", 200, [
-	[0, 0, 24, 19],
-	[25, 0, 49, 19],
+    [0, 0, 24, 19],
+    [25, 0, 49, 19],
 ])
 
 
 ROOM("firstRoom", () => {
 
-	BACKGROUND("bg1")
-	DESCRIPTION("Crossroads")
+    BACKGROUND("bg1")
+    DESCRIPTION("Crossroads")
 
-	HOTSPOT("sign1", 150, 60, 270, 130)
+    HOTSPOT("sign1", 150, 60, 270, 130)
 
-	ACTOR("james", "ijamesGun", 150, 165)
+    ACTOR("james", "ijamesGun", 150, 165)
 
-	ACTOR("james2", {
-		x: 200,
-		y: 10,
-		sprite: "ijamesGun",
-		hidden: true
-	})
+    ACTOR("james2", {
+        x: 200,
+        y: 10,
+        sprite: "ijamesGun",
+        hidden: true
+    })
 
-	LOOK("sign1", () => {
-		SHOWTEXT("The Bond Residence?")
-		WAIT(1300)
-		SHOWTEXT("I wonder where this path will take me!")
+    LOOK("sign1", () => {
+        SHOWTEXT("The Bond Residence?")
+        WAIT(1300)
+        SHOWTEXT("I wonder where this path will take me!")
 
-		PlayPong()
-	})
+        PlayPong()
+    })
 
-	USE("sign1", () => {
-		MOVEACTOR("james", -277, 165, 1000, true) // last param is wait
-		GOTO("roomA")
-	})
+    USE("sign1", () => {
+        MOVEACTOR("james", -277, 165, 1000, true) // last param is wait
+        GOTO("roomA")
+    })
 
-	ENTER(() => {
-		LOOPSOUND("theme1")
-		MOVEACTOR("james", 150, 165)
-		CHANGEIMAGE("james", ijamesGun)
-	})
+    ENTER(() => {
+        LOOPSOUND("theme1")
+        MOVEACTOR("james", 150, 165)
+        CHANGEIMAGE("james", ijamesGun)
+    })
 
-	function PlayPong() {
-		SHOWACTOR("pongBat")
-		// etc.
-		SHOWTEXT("YIPES!!!")
-	}
+    function PlayPong() {
+        SHOWACTOR("pongBat")
+        // etc.
+        SHOWTEXT("YIPES!!!")
+    }
 })
 
 
 
 
 // Custom test
-let c = 50;
-let m = false;
+let radius = 50;
+let isMouseDown = false;
+let lastKey = ''
 
 CUSTOM_INIT(ctx => {
     let { p5, canvas } = ctx;
-    
+
     canvas.mousePressed(e => {
-        m = true;
+        isMouseDown = true;
     });
     canvas.mouseReleased(e => {
-        m = false;
+        isMouseDown = false;
     });
     canvas.mouseWheel(e => {
-        c += e.deltaY / 20;
-		c = p5.constrain(c, 1, 1000);
+        radius += e.deltaY / 20;
+        radius = p5.constrain(radius, 1, 1000);
     });
 
-    p5.keyPressed = e => {
+    document.addEventListener('keypress', e => {
         console.log('Key pressed:', e);
-    }
+        lastKey = e.key;
+    })
 
     p5.noStroke();
 })
 
 CUSTOM_DRAW(ctx => {
     let { p5, canvas } = ctx;
-    
+
     if (p5.mouseX >= 0 && p5.mouseX <= canvas.width && p5.mouseY >= 0 && p5.mouseY <= canvas.height) {
-        if (m) {
-            p5.circle(p5.mouseX, p5.mouseY, c)
+        if (isMouseDown) {
+            p5.circle(p5.mouseX, p5.mouseY, radius)
             p5.fill(Math.random() * 255, Math.random() * 255, Math.random() * 255)
+            p5.text(lastKey, p5.mouseX, p5.mouseY) // Press a key to change it!
         }
     }
     else {
-        m = false;
+        isMouseDown = false;
     }
 })
