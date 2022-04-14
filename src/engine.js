@@ -1,12 +1,25 @@
 import p5 from "p5";
 
-const P5 = new p5();
+const P5 = new p5(_ => { });
 globalThis.P5 = P5;
+
+class CustomContext {
+    /** @type {p5} */
+    p5 = null;
+    /** @type {p5.Renderer} */
+    canvas = null;
+    gameInfo = null;
+    constructor(c) {
+        this.p5 = c.p5;
+        this.canvas = c.canvas;
+        this.gameInfo = c.gameInfo;
+    }
+}
 
 const g_GameInfo = {
     version: 1,
     name: "",
-    /** @type {string[]} */
+    /** @type {number[]} */
     authors: [],
     copyright: "",
     dateCreated: "",
@@ -24,6 +37,9 @@ const g_GameInfo = {
     images: [],
     sounds: [],
     animations: [],
+
+    customInit: [],
+    customDraw: []
 }
 
 let currentRoomDef = null
@@ -100,11 +116,33 @@ globalThis.ROOM = function (name, def) {
     });
 }
 
+/**
+ * 
+ * @param {function(CustomContext)} fn 
+ */
+globalThis.CUSTOM_INIT = function (fn) {
+    g_GameInfo.customInit.push(fn)
+}
+
+/**
+ * 
+ * @param {function(CustomContext)} fn 
+ */
+globalThis.CUSTOM_DRAW = function(fn) {
+    g_GameInfo.customDraw.push(fn)
+}
 
 function initialize() {
-    console.log("GameInfo:", g_GameInfo)
+    console.log("GameInfo:", g_GameInfo)    
     
-    P5.createCanvas(g_GameInfo.width, g_GameInfo.height);
+    const canvas = P5.createCanvas(g_GameInfo.width, g_GameInfo.height);
+
+    const context = new CustomContext({
+        p5: P5,
+        gameInfo: g_GameInfo,
+        canvas
+    })
+
     P5.background("#000000") 
     P5.stroke(0)
     P5.fill("#eeeeee")
@@ -114,11 +152,21 @@ function initialize() {
     P5.textSize(g_GameInfo.fontSize*0.75);
     P5.text("by " + g_GameInfo.authors.join(" & "), 0, g_GameInfo.fontSize, g_GameInfo.width, g_GameInfo.height)
     P5.textSize(g_GameInfo.fontSize);
+    
+    // Call custom init functions
+    g_GameInfo.customInit.forEach(fn => {
+        fn(context)
+    })
+
+    P5.draw = _ => {
+        // Call custom draw functions
+        g_GameInfo.customDraw.forEach(fn => {
+            fn(context)
+        })
+    }
 }
 
 setTimeout(initialize, 100);
 
 module.exports = {
-    hello: 'Hello World!',
-    foo: 9000
 }
