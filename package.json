@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "aqa",
-    "run-dev": "parcel src/test.html --no-cache --open"
+    "run-dev": "parcel src/test.html --no-cache --open",
+    "install-packages": "npm i"
   },
   "repository": {
     "type": "git",
