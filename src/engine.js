@@ -88,10 +88,20 @@ globalThis.STARTROOM = function (room) {
 }
 
 globalThis.ACTOR = function (name, def) {
-    g_GameInfo.actors.push({
-        name: name,
-        def: def
-    });
+    // If we're current handling room defs, add the actor to the current room
+    if (currentRoomDef) {
+        currentRoomDef.actors.push({
+            name: name,
+            def: def
+        });        
+    }
+    // Otherwise, add the actor to the global list
+    else {
+        g_GameInfo.actors.push({
+            name: name,
+            def: def
+        });
+    }
 }
 
 globalThis.IMAGE = function (name, fileName) {
@@ -154,6 +164,7 @@ globalThis.VERB = function (verb, subject, action) {
 globalThis.ENTER = function (action) {
     currentRoomDef.onEnter = action;
 }
+// ACTOR() is defined earlier in this file
 
 /**
  * 

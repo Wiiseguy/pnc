@@ -32,6 +32,11 @@ ANIMATION("iBatFlap", "iBatStrip", 200, [
     [25, 0, 49, 19],
 ])
 
+ACTOR("someGlobalActor", {
+    x: 0,
+    y: 0,
+    sprite: 'whoknows'
+})
 
 ROOM("firstRoom", () => {
 
@@ -40,13 +45,10 @@ ROOM("firstRoom", () => {
 
     HOTSPOT("sign1", 150, 60, 270, 130)
 
-    ACTOR("james", "ijamesGun", 150, 165)
-
-    ACTOR("james2", {
+    ACTOR("james", {
         x: 200,
         y: 10,
-        sprite: "ijamesGun",
-        hidden: true
+        sprite: "ijamesGun"
     })
 
     VERB('look', "sign1", () => {
