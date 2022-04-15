@@ -1,4 +1,4 @@
-import * as PNC from './engine';
+const PNC = require('./engine.js');
 
 NAME("James Bond's Amazing Adventure!")
 AUTHOR("Chronic")
@@ -10,18 +10,16 @@ FONTSIZE(32)
 STARTROOM("JBintro")
 
 //IMAGE("iIntroWalkStrip", "anim-walks.jpg")
-IMAGE("bgCrossroads", require('./data/James/Crossroads/bgCrossroads.png'))
+IMAGE("bgCrossroads", require('url:./data/James/Crossroads/bgCrossroads.png'))
 //IMAGE("ijamesGun", "data/James/Crossroads/jamesGun.png")
 //IMAGE("ijamesGun2", "data/James/Crossroads/jamesGun2.png")
 
 // Spoken samples
 
 // Music
-SOUND("theme1", "martian.mid")
-SOUND("jbTheme", "james-bond-theme.mid")
 
 // Sound effects and stuff
-SOUND("sndDoorOpen", "sfx-dooropens.wav")
+SOUND("menu", require("url:./data/menu.wav"))
 
 // Global vars (just normal js vars)
 var hasGateKey = false
@@ -124,3 +122,4 @@ CUSTOM_DRAW(ctx => {
         isMouseDown = false;
     }
 })
+

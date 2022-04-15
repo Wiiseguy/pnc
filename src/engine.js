@@ -1,6 +1,8 @@
-import p5 from "p5";
+const p5 = require("p5");
+globalThis.p5 = p5;
+const p5sound = require("p5/lib/addons/p5.sound");
 
-const P5 = new p5(_ => { });
+const P5 = new p5(() => 1337);
 globalThis.P5 = P5;
 
 class CustomContext {
@@ -95,19 +97,8 @@ globalThis.IMAGE = function (name, fileName) {
     g_GameInfo.images.push({
         name: name,
         fileName: fileName,
-        image: P5.loadImage(fileName, loadImage_Success, loadImage_Fail)
+        image: null
     });
-}
-
-
-// IMAGE LOADING DEBUG
-function loadImage_Success(img) {
-    console.log("[IMAGE] Loaded: ", arguments)
-}
-
-// IMAGE LOADING DEBUG
-function loadImage_Fail(file) {
-    console.warn("[IMAGE] Failed: ", arguments)
 }
 
 globalThis.ANIMATION = function (name, img, speed, def) {
@@ -119,10 +110,11 @@ globalThis.ANIMATION = function (name, img, speed, def) {
     });
 }
 
-globalThis.SOUND = function (name, file) {
+globalThis.SOUND = function (name, fileName) {
     g_GameInfo.sounds.push({
         name: name,
-        file: file
+        fileName: fileName,
+        sound: null
     });
 }
 
@@ -166,10 +158,13 @@ function initialize() {
     P5.textSize(g_GameInfo.fontSize);
     P5.textAlign(P5.CENTER, P5.CENTER);
 
-    // DELME: Draw all images (test only)
+    // @Chronic DELME: Draw all images and play all sounds (test only)
     g_GameInfo.images.forEach(img => {
         P5.image(img.image, 0, 0);
     });
+    g_GameInfo.sounds.forEach(s => {
+        s.sound.play();
+    })
 
     // Draw the Game title and author(s) unless NOINTRO() is used.
     if (!g_GameInfo.skipIntro) {
@@ -190,9 +185,30 @@ function initialize() {
             fn(context)
         })
     }
+
+
+    console.log("Initialized")
 }
 
-setTimeout(initialize, 100);
+P5.preload = function () {
+    console.log("Preload")
+
+    // Preload images
+    // by doing this inside p5's preload(), setup() won't be called until all assets are loaded
+    g_GameInfo.images.forEach(img => {
+        img.image = P5.loadImage(img.fileName);
+    })
+
+    // Preload sounds
+    g_GameInfo.sounds.forEach(sound => {
+        sound.sound = P5.loadSound(sound.fileName);
+    })
+}
+
+P5.setup = function () {
+    console.log("Setup")
+    initialize();
+}
 
 module.exports = {
 }
