@@ -49,7 +49,7 @@ ROOM("firstRoom", () => {
         hidden: true
     })
 
-    LOOK("sign1", () => {
+    VERB('look', "sign1", () => {
         SHOWTEXT("The Bond Residence?")
         WAIT(1300)
         SHOWTEXT("I wonder where this path will take me!")
@@ -57,7 +57,7 @@ ROOM("firstRoom", () => {
         PlayPong()
     })
 
-    USE("sign1", () => {
+    VERB('use', "sign1", () => {
         MOVEACTOR("james", -277, 165, 1000, true) // last param is wait
         GOTO("roomA")
     })

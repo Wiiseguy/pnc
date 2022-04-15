@@ -50,6 +50,7 @@ class GameInfo {
 }
 
 const g_GameInfo = new GameInfo();
+let currentRoomDef = null;
 
 
 globalThis.NAME = function (name) {
@@ -121,8 +122,37 @@ globalThis.SOUND = function (name, fileName) {
 globalThis.ROOM = function (name, def) {
     g_GameInfo.rooms.push({
         name: name,
-        def: def
+        def: def,
+        description: '',
+        background: null,
+        verbs: [],
+        hotspots: [],
+        actors: [],
+        onEnter: null
     });
+}
+
+// Room functions
+globalThis.BACKGROUND = function (imageName) {
+    currentRoomDef.background = imageName;
+}
+globalThis.DESCRIPTION = function (desc) {
+    currentRoomDef.description = desc;
+}
+globalThis.HOTSPOT = function (name, x, y, width, height) {
+    currentRoomDef.hotspots.push({
+        name: name,
+        x: x,
+        y: y,        
+        width: width,
+        height: height
+    });
+}
+globalThis.VERB = function (verb, subject, action) {
+    currentRoomDef.verbs.push({verb, subject, action})
+}
+globalThis.ENTER = function (action) {
+    currentRoomDef.onEnter = action;
 }
 
 /**
@@ -150,6 +180,13 @@ function initialize() {
         p5: P5,
         gameInfo: g_GameInfo,
         canvas
+    })
+
+    // Initialize rooms
+    g_GameInfo.rooms.forEach(r => {
+        currentRoomDef = r;
+        r.def();
+        console.log("Handled room: " + r.name, r)
     })
 
     P5.background("#000000")
