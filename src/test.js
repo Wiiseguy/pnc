@@ -9,11 +9,10 @@ NOINTRO()
 
 STARTROOM("JBintro")
 
-IMAGE("iIntroWalkStrip", "anim-walks.jpg")
-
-IMAGE("bg1", "bgRoom1.png")
-IMAGE("ijamesGun", "jamesGun.png")
-IMAGE("ijamesGun2", "jamesGun2.png")
+//IMAGE("iIntroWalkStrip", "anim-walks.jpg")
+IMAGE("bgCrossroads", "/data/James/Crossroads/bgCrossroads.png")
+//IMAGE("ijamesGun", "data/James/Crossroads/jamesGun.png")
+//IMAGE("ijamesGun2", "data/James/Crossroads/jamesGun2.png")
 
 
 // Spoken samples

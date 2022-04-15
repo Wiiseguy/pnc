@@ -96,6 +96,19 @@ globalThis.IMAGE = function (name, file) {
         name: name,
         file: file
     });
+
+    img = P5.loadImage(file, loadImage_Success(file), loadImage_Fail(file));
+}
+
+
+// IMAGE LOADING DEBUG
+function loadImage_Success(file, Event) {
+    console.log("[IMAGE] Loaded: ", file)
+}
+
+// IMAGE LOADING DEBUG
+function loadImage_Fail(file, Event) {
+    console.log("[IMAGE] Failed: ", file)
 }
 
 globalThis.ANIMATION = function (name, img, speed, def) {
