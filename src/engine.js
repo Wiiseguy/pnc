@@ -91,24 +91,23 @@ globalThis.ACTOR = function (name, def) {
     });
 }
 
-globalThis.IMAGE = function (name, file) {
+globalThis.IMAGE = function (name, fileName) {
     g_GameInfo.images.push({
         name: name,
-        file: file
+        fileName: fileName,
+        image: P5.loadImage(fileName, loadImage_Success, loadImage_Fail)
     });
-
-    img = P5.loadImage(file, loadImage_Success(file), loadImage_Fail(file));
 }
 
 
 // IMAGE LOADING DEBUG
-function loadImage_Success(file, Event) {
-    console.log("[IMAGE] Loaded: ", file)
+function loadImage_Success(img) {
+    console.log("[IMAGE] Loaded: ", arguments)
 }
 
 // IMAGE LOADING DEBUG
-function loadImage_Fail(file, Event) {
-    console.log("[IMAGE] Failed: ", file)
+function loadImage_Fail(file) {
+    console.warn("[IMAGE] Failed: ", arguments)
 }
 
 globalThis.ANIMATION = function (name, img, speed, def) {
@@ -166,6 +165,11 @@ function initialize() {
     P5.fill("#eeeeee")
     P5.textSize(g_GameInfo.fontSize);
     P5.textAlign(P5.CENTER, P5.CENTER);
+
+    // DELME: Draw all images (test only)
+    g_GameInfo.images.forEach(img => {
+        P5.image(img.image, 0, 0);
+    });
 
     // Draw the Game title and author(s) unless NOINTRO() is used.
     if (!g_GameInfo.skipIntro) {

@@ -5,15 +5,14 @@ AUTHOR("Chronic")
 AUTHOR("Wiiseguy")
 SIZE(640, 480)
 FONTSIZE(32)
-NOINTRO()
+//NOINTRO()
 
 STARTROOM("JBintro")
 
 //IMAGE("iIntroWalkStrip", "anim-walks.jpg")
-IMAGE("bgCrossroads", "/data/James/Crossroads/bgCrossroads.png")
+IMAGE("bgCrossroads", require('./data/James/Crossroads/bgCrossroads.png'))
 //IMAGE("ijamesGun", "data/James/Crossroads/jamesGun.png")
 //IMAGE("ijamesGun2", "data/James/Crossroads/jamesGun2.png")
-
 
 // Spoken samples
 
@@ -109,10 +108,13 @@ CUSTOM_INIT(ctx => {
 })
 
 CUSTOM_DRAW(ctx => {
-    let { p5, canvas } = ctx;
+    let { p5, canvas, gameInfo } = ctx;
 
     if (p5.mouseX >= 0 && p5.mouseX <= canvas.width && p5.mouseY >= 0 && p5.mouseY <= canvas.height) {
-        if (isMouseDown) {
+        if (isMouseDown) { 
+            if (gameInfo.images[0]) {
+                p5.image(gameInfo.images[0].image, p5.mouseX - radius, p5.mouseY - radius, radius * 2, radius * 2);
+            }
             p5.circle(p5.mouseX, p5.mouseY, radius)
             p5.fill(Math.random() * 255, Math.random() * 255, Math.random() * 255)
             p5.text(lastKey, p5.mouseX, p5.mouseY) // Press a key to change it!
