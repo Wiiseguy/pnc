@@ -51,6 +51,8 @@ class GameInfo {
 
 const g_GameInfo = new GameInfo();
 let currentRoomDef = null;
+let currentRoom = null;
+let isMouseDown = false;
 
 
 globalThis.NAME = function (name) {
@@ -92,8 +94,8 @@ globalThis.ACTOR = function (name, def) {
     if (currentRoomDef) {
         currentRoomDef.actors.push({
             name: name,
-            def: def
-        });        
+            ...def
+        });
     }
     // Otherwise, add the actor to the global list
     else {
@@ -102,6 +104,7 @@ globalThis.ACTOR = function (name, def) {
             def: def
         });
     }
+    console.log("[ACTOR]: ", def)
 }
 
 globalThis.IMAGE = function (name, fileName) {
@@ -132,7 +135,7 @@ globalThis.SOUND = function (name, fileName) {
 globalThis.ROOM = function (name, def) {
     g_GameInfo.rooms.push({
         name: name,
-        def: def,
+        roomInitFn: def,
         description: '',
         background: null,
         verbs: [],
@@ -149,17 +152,17 @@ globalThis.BACKGROUND = function (imageName) {
 globalThis.DESCRIPTION = function (desc) {
     currentRoomDef.description = desc;
 }
-globalThis.HOTSPOT = function (name, x, y, width, height) {
+globalThis.HOTSPOT = function (name, x1, y1, x2, y2) {
     currentRoomDef.hotspots.push({
         name: name,
-        x: x,
-        y: y,        
-        width: width,
-        height: height
+        x1: x1,
+        y1: y1,
+        x2: x2,
+        y2: y2
     });
 }
 globalThis.VERB = function (verb, subject, action) {
-    currentRoomDef.verbs.push({verb, subject, action})
+    currentRoomDef.verbs.push({ verb, subject, action })
 }
 globalThis.ENTER = function (action) {
     currentRoomDef.onEnter = action;
@@ -187,6 +190,20 @@ function initialize() {
 
     const canvas = P5.createCanvas(g_GameInfo.width, g_GameInfo.height);
 
+    canvas.mousePressed(e => {
+        isMouseDown = true;
+
+        currentRoom.hotspots.forEach(h => {
+            if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {                               
+                currentRoom = g_GameInfo.rooms[1];
+            }
+        })
+    });
+    
+    canvas.mouseReleased(e => {
+        isMouseDown = false;
+    });
+
     const context = new CustomContext({
         p5: P5,
         gameInfo: g_GameInfo,
@@ -196,7 +213,13 @@ function initialize() {
     // Initialize rooms
     g_GameInfo.rooms.forEach(r => {
         currentRoomDef = r;
-        r.def();
+        r.roomInitFn();
+        r.backgroundImage = g_GameInfo.images.find(i => i.name == r.background).image
+
+        r.actors.forEach(a => {
+            a.image = g_GameInfo.images.find(i => i.name == a.image).image
+        })
+
         console.log("Handled room: " + r.name, r)
     })
 
@@ -207,12 +230,12 @@ function initialize() {
     P5.textAlign(P5.CENTER, P5.CENTER);
 
     // @Chronic DELME: Draw all images and play all sounds (test only)
-    g_GameInfo.images.forEach(img => {
-        P5.image(img.image, 0, 0);
-    });
-    g_GameInfo.sounds.forEach(s => {
-        s.sound.play();
-    })
+    // g_GameInfo.images.forEach(img => {
+    //     P5.image(img.image, 0, 0);
+    // });
+    // g_GameInfo.sounds.forEach(s => {
+    //     s.sound.play();
+    // })
 
     // Draw the Game title and author(s) unless NOINTRO() is used.
     if (!g_GameInfo.skipIntro) {
@@ -228,13 +251,42 @@ function initialize() {
     })
 
     P5.draw = _ => {
+
+        // Draw Background
+        P5.image(currentRoom.backgroundImage, 0, 0)
+
+
+        // Draw Actors (JAMES FOR THE WIN)
+        currentRoom.actors.forEach(a => {
+            P5.image(a.image, a.x, a.y)
+        })
+
+        // Draw Hotspots (DEBUG)
+        currentRoom.hotspots.forEach(h => {
+            P5.push()
+            P5.noStroke()
+            if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
+                P5.fill(255, 0, 0, 128)
+            }
+            else {
+                P5.fill(0, 0, 0, 128)
+            }
+            P5.rect(h.x1, h.y1, h.x2 - h.x1, h.y2 - h.y1)
+            P5.pop()
+        })
+
         // Call custom draw functions
         g_GameInfo.customDraw.forEach(fn => {
             fn(context)
         })
     }
 
+    //
+    currentRoom = g_GameInfo.rooms.find(r => r.name == g_GameInfo.startRoom)
 
+    if (!currentRoom) {
+        currentRoom = g_GameInfo.rooms[0]
+    }
     console.log("Initialized")
 }
 

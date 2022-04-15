@@ -7,6 +7,7 @@ html, body {
 body {
     text-align: center;
     background-color: #223;
+    padding-top: 20px
 }
 
 :fullscreen {
