@@ -96,15 +96,17 @@ globalThis.ACTOR = function (name, def) {
             name: name,
             ...def
         });
+        console.log("[ACTOR]: ", name)
+
     }
     // Otherwise, add the actor to the global list
     else {
         g_GameInfo.actors.push({
             name: name,
-            def: def
+            ...def
         });
+        console.log("[GLOBAL ACTOR]: ", name)
     }
-    console.log("[ACTOR]: ", def)
 }
 
 globalThis.IMAGE = function (name, fileName) {
@@ -194,12 +196,12 @@ function initialize() {
         isMouseDown = true;
 
         currentRoom.hotspots.forEach(h => {
-            if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {                               
+            if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
                 currentRoom = g_GameInfo.rooms[1];
             }
         })
     });
-    
+
     canvas.mouseReleased(e => {
         isMouseDown = false;
     });
@@ -223,19 +225,15 @@ function initialize() {
         console.log("Handled room: " + r.name, r)
     })
 
+    g_GameInfo.actors.forEach(ga => {
+        ga.image = g_GameInfo.images.find(i => i.name == ga.image).image
+    })
+
     P5.background("#000000")
     P5.stroke(0)
     P5.fill("#eeeeee")
     P5.textSize(g_GameInfo.fontSize);
     P5.textAlign(P5.CENTER, P5.CENTER);
-
-    // @Chronic DELME: Draw all images and play all sounds (test only)
-    // g_GameInfo.images.forEach(img => {
-    //     P5.image(img.image, 0, 0);
-    // });
-    // g_GameInfo.sounds.forEach(s => {
-    //     s.sound.play();
-    // })
 
     // Draw the Game title and author(s) unless NOINTRO() is used.
     if (!g_GameInfo.skipIntro) {
@@ -251,13 +249,16 @@ function initialize() {
     })
 
     P5.draw = _ => {
-
         // Draw Background
         P5.image(currentRoom.backgroundImage, 0, 0)
 
-
-        // Draw Actors (JAMES FOR THE WIN)
+        // Draw Current Room Actors
         currentRoom.actors.forEach(a => {
+            P5.image(a.image, a.x, a.y)
+        })
+
+        // Draw Global Actors
+        g_GameInfo.actors.forEach(a => {
             P5.image(a.image, a.x, a.y)
         })
 
@@ -265,13 +266,12 @@ function initialize() {
         currentRoom.hotspots.forEach(h => {
             P5.push()
             P5.noStroke()
-            if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
-                P5.fill(255, 0, 0, 128)
-            }
-            else {
-                P5.fill(0, 0, 0, 128)
-            }
+            P5.fill((P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) * 255, 0, 0, 128)
             P5.rect(h.x1, h.y1, h.x2 - h.x1, h.y2 - h.y1)
+            P5.fill(200)
+            P5.textSize(16)
+            P5.textAlign("right","bottom")
+            P5.text(h.name,h.x2,h.y2)
             P5.pop()
         })
 
@@ -281,12 +281,13 @@ function initialize() {
         })
     }
 
-    //
+    // Set Start Room, or fall back to first room
     currentRoom = g_GameInfo.rooms.find(r => r.name == g_GameInfo.startRoom)
-
     if (!currentRoom) {
         currentRoom = g_GameInfo.rooms[0]
     }
+
+    // Initialization complete
     console.log("Initialized")
 }
 

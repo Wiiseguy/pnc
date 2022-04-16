@@ -34,9 +34,9 @@ ANIMATION("iBatFlap", "iBatStrip", 200, [
 ])
 
 ACTOR("someGlobalActor", {
-    x: 0,
-    y: 0,
-    image: 'whoknows'
+    x: 490,
+    y: 320,
+    image: 'ijamesGun2'
 })
 
 ROOM("firstRoom", () => {
