@@ -101,7 +101,7 @@ globalThis.ROOM = function (name, def) {
         verbs: [],
         hotspots: [],
         actors: [],
-        onEnter: null
+        onEnter: function () { }
     });
 }
 
@@ -152,23 +152,28 @@ globalThis.WAIT = function () {
     unimplemented('WAIT', ...arguments)
 };
 globalThis.GOTO = function (room) {
-    currentRoom = gameInfo.rooms.find(r => r.name == room)
+    let r = gameInfo.rooms.find(r => r.name == room)
+    setRoom(r)
 };
-
 globalThis.SHOWACTOR = function (name) {
     let actor = getRoomActor(name);
     if(actor) actor.visible = true;
 };
-
 globalThis.HIDEACTOR = function (name) {
     let actor = getRoomActor(name);
     if(actor) actor.visible = false;
 };
-
 globalThis.MOVEACTOR = function () {
     unimplemented('MOVEACTOR', ...arguments)
 };
 
+globalThis.PLAYSOUND = function (name) {
+    let sound = gameInfo.sounds.find(s => s.name === name);
+    sound?.sound.play()
+};
+globalThis.LOOPSOUND = function () {
+    unimplemented('LOOPSOUND', ...arguments)
+};
 
 /**
  * 
@@ -184,6 +189,16 @@ globalThis.CUSTOM_INIT = function (fn) {
  */
 globalThis.CUSTOM_DRAW = function (fn) {
     gameInfo.customDraw.push(fn)
+}
+
+
+function setRoom(room) {    
+    if (!room) {
+        console.error('Room not found:', room)
+        return;
+    }
+    currentRoom = room;
+    currentRoom.onEnter();
 }
 
 function getImageByName(name) {
@@ -358,10 +373,11 @@ function initialize() {
     }
 
     // Set Start Room, or fall back to first room
-    currentRoom = gameInfo.rooms.find(r => r.name == gameInfo.startRoom)
-    if (!currentRoom) {
-        currentRoom = gameInfo.rooms[0]
+    let initialRoom = gameInfo.rooms.find(r => r.name == gameInfo.startRoom)
+    if (!initialRoom) {
+        initialRoom = gameInfo.rooms[0]
     }
+    setRoom(initialRoom)
 
     // Initialization complete
     console.log("Initialized")

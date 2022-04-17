@@ -14,6 +14,7 @@ STARTROOM("LeftRoom")
 IMAGE("LeftRoomBG", require('url:./data/TestAdv/LeftRoom/LeftRoomBG.png'))
 IMAGE("TestActor", require('url:./data/TestAdv/LeftRoom/TestActor.png'))
 IMAGE("Shelf", require('url:./data/TestAdv/LeftRoom/Shelf.png'))
+IMAGE("Kitchenimg", require('url:./data/images.jpg'))
 
 // Room - Right Room
 IMAGE("RightRoomBG", require('url:./data/TestAdv/RightRoom/RightRoomBG.png'))
@@ -24,9 +25,9 @@ IMAGE("WallSafe", require('url:./data/TestAdv/RightRoom/WallSafe.png'))
 IMAGE("KitchenBG", require('url:./data/TestAdv/KitchenRoom/KitchenBG.png'))
 
 
-
 // Sound effects and stuff
 SOUND("menu", require("url:./data/menu.wav"))
+SOUND("kitchen", require("url:./data/62215.wav"))
 
 // Global vars (just normal js vars)
 var hasTestActorMoved = false
@@ -59,7 +60,7 @@ ROOM("LeftRoom", () => {
     HOTSPOT("mouseHole",175, 290, 195, 310)
 
     ENTER(() => {
-        LOOPSOUND("theme1")
+        PLAYSOUND("menu")
     })
 
     ACTOR("TestActor", {
@@ -157,10 +158,20 @@ ROOM("RightRoom", () => {
 ROOM("KitchenRoom", () => {
     BACKGROUND("KitchenBG")
 
-    HOTSPOT("gotoRightRoom",50, 50, 200, 200)
+    ACTOR("Painting", {
+        x: 266,
+        y: 95,
+        image: "Kitchenimg"
+    })
+
+    HOTSPOT("gotoRightRoom", 50, 50, 200, 200)
 
     VERB('use', "gotoRightRoom", () => {
         GOTO("RightRoom")
+    })
+
+    ENTER(() => {
+        PLAYSOUND("kitchen")
     })
 })
 
