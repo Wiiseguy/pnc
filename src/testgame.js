@@ -19,6 +19,11 @@ IMAGE("RightRoomBG", require('url:./data/TestAdv/RightRoom/RightRoomBG.png'))
 IMAGE("Painting", require('url:./data/TestAdv/RightRoom/Painting.png'))
 IMAGE("WallSafe", require('url:./data/TestAdv/RightRoom/WallSafe.png'))
 
+// Room - Kitchen
+IMAGE("KitchenBG", require('url:./data/TestAdv/KitchenRoom/KitchenBG.png'))
+
+
+
 // Sound effects and stuff
 SOUND("menu", require("url:./data/menu.wav"))
 
@@ -38,13 +43,14 @@ ANIMATION("iBatFlap", "iBatStrip", 200, [
 //     image: 'TestActor'
 // })
 
+
+ROOM("LeftRoom", () => {
 /*
-    Left Room Puzzle:
+    Room Puzzle:
         TestActor is in the way of the closet door, A mouse needs to be lured out
         of the mousehole to scare TestActor out of the room.
 */
 
-ROOM("LeftRoom", () => {
     BACKGROUND("LeftRoomBG")
 
     HOTSPOT("gotoCloset", 347, 114, 442, 307)
@@ -97,7 +103,6 @@ ROOM("LeftRoom", () => {
         GOTO("RightRoom")
     })
 
-
     function LookAtMouseHole() {
         SHOWACTOR("MouseLarge")
         SHOWTEXT("Holy... That thing is huge!")
@@ -106,7 +111,15 @@ ROOM("LeftRoom", () => {
 
 
 ROOM("RightRoom", () => {
+/*
+    Room Puzzle:
+        Move painting, open safe with code from closet
+*/
+
     BACKGROUND("RightRoomBG")
+
+    HOTSPOT("gotoLeftRoom",0, 0, 30, 400)
+    HOTSPOT("gotoKitchenRoom", 582, 139, 623, 382)
 
     ACTOR("WallSafe", {
         x: 285,
@@ -119,6 +132,15 @@ ROOM("RightRoom", () => {
         y: 95,
         image: "Painting"
     })
+
+    VERB('use', "gotoLeftRoom", () => {
+        GOTO("LeftRoom")
+    })
+})
+
+
+ROOM("Kitchen", () => {
+    BACKGROUND("KitchenBG")
 })
 
 // // Custom test
