@@ -14,7 +14,6 @@ STARTROOM("LeftRoom")
 IMAGE("LeftRoomBG", require('url:./data/TestAdv/LeftRoom/LeftRoomBG.png'))
 IMAGE("TestActor", require('url:./data/TestAdv/LeftRoom/TestActor.png'))
 IMAGE("Shelf", require('url:./data/TestAdv/LeftRoom/Shelf.png'))
-IMAGE("Kitchenimg", require('url:./data/images.jpg'))
 
 // Room - Right Room
 IMAGE("RightRoomBG", require('url:./data/TestAdv/RightRoom/RightRoomBG.png'))
@@ -23,6 +22,9 @@ IMAGE("WallSafe", require('url:./data/TestAdv/RightRoom/WallSafe.png'))
 
 // Room - Kitchen
 IMAGE("KitchenBG", require('url:./data/TestAdv/KitchenRoom/KitchenBG.png'))
+IMAGE("FridgeDoorClosed", require('url:./data/TestAdv/KitchenRoom/FridgeDoorClosed.png'))
+IMAGE("FridgeDoorOpen", require('url:./data/TestAdv/KitchenRoom/FridgeDoorOpen.png'))
+IMAGE("Cheese", require('url:./data/TestAdv/KitchenRoom/Cheese.png'))
 
 
 // Sound effects and stuff
@@ -158,20 +160,45 @@ ROOM("RightRoom", () => {
 ROOM("KitchenRoom", () => {
     BACKGROUND("KitchenBG")
 
-    ACTOR("Painting", {
-        x: 266,
-        y: 95,
-        image: "Kitchenimg"
+    HOTSPOT("gotoRightRoom", 14 , 135, 54, 387)
+
+    ACTOR("FridgeDoorClosed", {
+        x: 101,
+        y: 210,
+        image: "FridgeDoorClosed"
     })
 
-    HOTSPOT("gotoRightRoom", 50, 50, 200, 200)
+    ACTOR("FridgeDoorOpen", {
+        x: 71,
+        y: 210,
+        image: "FridgeDoorOpen"
+    })
+
+    ACTOR("Cheese", {
+        x: 126,
+        y: 229,
+        image: "Cheese"
+    })
 
     VERB('use', "gotoRightRoom", () => {
         GOTO("RightRoom")
     })
 
+    VERB('use', "FridgeDoorClosed", () => {
+        HIDEACTOR("FridgeDoorClosed")
+        SHOWACTOR("FridgeDoorOpen")
+        SHOWACTOR("Cheese")
+    })
+
+    VERB('use', "Cheese", () => {
+        HIDEACTOR("Cheese")
+        hasCheese = true
+    })
+
     ENTER(() => {
-        PLAYSOUND("kitchen")
+        //PLAYSOUND("kitchen")
+        HIDEACTOR("FridgeDoorOpen")
+        HIDEACTOR("Cheese")
     })
 })
 
