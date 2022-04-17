@@ -1,59 +1,15 @@
 const p5 = require("p5");
 globalThis.p5 = p5;
 const p5sound = require("p5/lib/addons/p5.sound");
+const { GameInfo, CustomContext } = require("./engine.core");
 
 const P5 = new p5(() => 1337);
 globalThis.P5 = P5;
 
-class CustomContext {
-    /** @type {p5} */
-    p5 = null;
-    /** @type {p5.Renderer} */
-    canvas = null;
-    /** @type {p5.GameInfo} */
-    gameInfo = null;
-    constructor(c) {
-        this.p5 = c.p5;
-        this.canvas = c.canvas;
-        this.gameInfo = c.gameInfo;
-    }
-}
-
-class GameInfo {
-    version = 1;
-    name = "";
-    /** @type {number[]} */
-    authors = [];
-    copyright = "";
-    dateCreated = "";
-    dateModified = "";
-    description = "";
-    width = 640;
-    height = 480;
-    fontSize = 16;
-    /** @type {p5.Color} */
-    bgColor = "#000000";
-    skipIntro = false;
-    startRoom = "";
-    rooms = [];
-    actors = [];
-    images = [];
-    sounds = [];
-    animations = [];
-
-    customInit = [];
-    customDraw = [];
-
-    constructor() {
-
-    }
-}
 
 const gameInfo = new GameInfo();
 let currentRoomDef = null;
 let currentRoom = null;
-let isMouseDown = false;
-
 
 globalThis.NAME = function (name) {
     gameInfo.name = name;
