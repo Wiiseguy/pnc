@@ -35,7 +35,7 @@ ANIMATION("iBatFlap", "iBatStrip", 200, [
 // ACTOR("someGlobalActor", {
 //     x: 490,
 //     y: 320,
-//     image: 'globalActor'
+//     image: 'TestActor'
 // })
 
 /*
@@ -65,6 +65,10 @@ ROOM("LeftRoom", () => {
         x: 67,
         y: 219,
         image: "Shelf"
+    })
+
+    VERB('look', "TestActor", () => {
+        SHOWTEXT("A TestActor")
     })
 
     VERB('look', "mouseHole", () => {

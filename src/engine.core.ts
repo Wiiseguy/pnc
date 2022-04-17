@@ -26,13 +26,66 @@ export class CustomContext {
     }
 }
 
+interface IInteractive {
+    actions: GameAction[];
+}
 
-export class GameActor {
+
+export class GameActor implements IInteractive {
+    name: string;
+    actions: GameAction[];
     initialX: number;
     initialY: number;
     x: number;
     y: number;
+    imageName: string;
     image: P5.Image;
+    constructor(name: string, x: number, y: number, imageName: string) {
+        this.name = name;
+        this.initialX = x;
+        this.initialY = y;
+        this.x = x;
+        this.y = y;
+        this.imageName = imageName;
+        this.actions = [];
+    }
+}
+
+export class GameAction {
+    name: string;
+    action: (context: CustomContext) => void;
+    constructor(name, action) {
+        this.name = name;
+        this.action = action;
+    }
+}
+
+export class GameHotspot implements IInteractive {
+    name: string;
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+    actions: GameAction[];
+    constructor(c) {
+        this.name = c.name;
+        this.x1 = c.x1;
+        this.y1 = c.y1;
+        this.x2 = c.x2;
+        this.y2 = c.y2;
+        this.actions = c.actions;
+    }
+}
+
+export class GameRoom {
+    name: string;
+    hotspots: GameHotspot[];
+    actors: GameActor[];
+    constructor(c) {
+        this.name = c.name;
+        this.hotspots = c.hotspots;
+        this.actors = c.actors;
+    }
 }
 
 export class GameInfo {
