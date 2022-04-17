@@ -151,13 +151,22 @@ globalThis.SHOWTEXT = function () {
 globalThis.WAIT = function () {
     unimplemented('WAIT', ...arguments)
 };
-globalThis.GOTO = function () {
-    // @Chronic, you know what to do ;)
-    unimplemented('GOTO', ...arguments)
+globalThis.GOTO = function (room) {
+    currentRoom = gameInfo.rooms.find(r => r.name == room)
 };
+
 globalThis.SHOWACTOR = function () {
     unimplemented('SHOWACTOR', ...arguments)
 };
+
+globalThis.HIDEACTOR = function () {
+    unimplemented('HIDEACTOR', ...arguments)
+};
+
+globalThis.MOVEACTOR = function () {
+    unimplemented('MOVEACTOR', ...arguments)
+};
+
 
 /**
  * 
@@ -179,10 +188,6 @@ function getImageByName(name) {
     let image = gameInfo.images.find(img => img.name === name);
     if (!image) throw new Error(`Image with name ${name} not found`);
     return image;
-}
-
-function getActionByNameOrWildcard(actions, name) {
-    return actions?.find(a => a.name === name || a.name === '*')
 }
 
 function initializeActor(actor) {
@@ -207,7 +212,7 @@ function initialize() {
 
         for (let a of currentRoom.actors) {
             if (P5.mouseX >= a.x && P5.mouseX <= a.x + a.image.image.width && P5.mouseY >= a.y && P5.mouseY <= a.y + a.image.image.height) {
-                action = getActionByNameOrWildcard(a.actions, currentVerb);
+                action = a.actions?.find(a => a.name === currentVerb);
                 if (action) break; // Quit looking and break from for loop
             }
         }
@@ -216,7 +221,7 @@ function initialize() {
         if (!action) {
             for(let h of currentRoom.hotspots) {
                 if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
-                    action = getActionByNameOrWildcard(h.actions, currentVerb);
+                    action = h.actions?.find(a => a.name === currentVerb);
                     if (action) break; // Quit looking and break from for loop
                 }
             }
