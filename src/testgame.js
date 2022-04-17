@@ -12,9 +12,12 @@ STARTROOM("LeftRoom")
 // Room - Left Room
 IMAGE("LeftRoomBG", require('url:./data/TestAdv/LeftRoom/LeftRoomBG.png'))
 IMAGE("TestActor", require('url:./data/TestAdv/LeftRoom/TestActor.png'))
+IMAGE("Shelf", require('url:./data/TestAdv/LeftRoom/Shelf.png'))
 
 // Room - Right Room
 IMAGE("RightRoomBG", require('url:./data/TestAdv/RightRoom/RightRoomBG.png'))
+IMAGE("Painting", require('url:./data/TestAdv/RightRoom/Painting.png'))
+IMAGE("WallSafe", require('url:./data/TestAdv/RightRoom/WallSafe.png'))
 
 // Sound effects and stuff
 SOUND("menu", require("url:./data/menu.wav"))
@@ -45,17 +48,23 @@ ROOM("LeftRoom", () => {
     BACKGROUND("LeftRoomBG")
 
     HOTSPOT("gotoCloset", 347, 114, 442, 307)
-    HOTSPOT("mouseHole",175, 290, 195, 310)
     HOTSPOT("gotoRightRoom",610, 0, 640, 400)
+    HOTSPOT("mouseHole",175, 290, 195, 310)
 
     ENTER(() => {
         LOOPSOUND("theme1")
     })
 
     ACTOR("TestActor", {
-        x: 360,
+        x: 370,
         y: 160,
         image: "TestActor"
+    })
+
+    ACTOR("Shelf", {
+        x: 67,
+        y: 219,
+        image: "Shelf"
     })
 
     VERB('look', "mouseHole", () => {
@@ -80,6 +89,11 @@ ROOM("LeftRoom", () => {
         }
     })
 
+    VERB('use', "gotoRightRoom", () => {
+        GOTO("RightRoom")
+    })
+
+
     function LookAtMouseHole() {
         SHOWACTOR("MouseLarge")
         SHOWTEXT("Holy... That thing is huge!")
@@ -89,6 +103,18 @@ ROOM("LeftRoom", () => {
 
 ROOM("RightRoom", () => {
     BACKGROUND("RightRoomBG")
+
+    ACTOR("WallSafe", {
+        x: 285,
+        y: 127,
+        image: "WallSafe"
+    })
+
+    ACTOR("Painting", {
+        x: 266,
+        y: 95,
+        image: "Painting"
+    })
 })
 
 // // Custom test
