@@ -6,6 +6,7 @@ AUTHOR("Wiiseguy")
 SIZE(640, 400)
 FONTSIZE(32)
 //NOINTRO()
+BGCOLOR('#ff00ff')
 
 STARTROOM("LeftRoom")
 

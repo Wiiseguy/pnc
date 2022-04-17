@@ -260,7 +260,9 @@ function initialize() {
     gameInfo.rooms.forEach(r => {
         currentRoomDef = r;
         r.roomInitFn();
-        r.backgroundImage = getImageByName(r.background);
+        if (r.background) {
+            r.backgroundImage = getImageByName(r.background);
+        }
 
         r.actors.forEach(initializeActor)
 
@@ -290,7 +292,11 @@ function initialize() {
 
     P5.draw = _ => {
         // Draw Background
-        P5.image(currentRoom.backgroundImage.image, 0, 0)
+        if (currentRoom.backgroundImage) {
+            P5.image(currentRoom.backgroundImage.image, 0, 0)
+        } else {
+            P5.background(gameInfo.bgColor)
+        }
 
         // Draw Hotspots (DEBUG)
         currentRoom.hotspots.forEach(h => {
