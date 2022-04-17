@@ -134,14 +134,34 @@ ROOM("RightRoom", () => {
         image: "Painting"
     })
 
+    VERB('use', "WallSafe", () => {
+        HIDEACTOR("LOL")
+    })
+
+    VERB('use', "Painting", () => {
+        HIDEACTOR("Painting")
+    })
+
+
+
     VERB('use', "gotoLeftRoom", () => {
         GOTO("LeftRoom")
+    })
+
+    VERB('use', "gotoKitchenRoom", () => {
+        GOTO("KitchenRoom")
     })
 })
 
 
-ROOM("Kitchen", () => {
+ROOM("KitchenRoom", () => {
     BACKGROUND("KitchenBG")
+
+    HOTSPOT("gotoRightRoom",50, 50, 200, 200)
+
+    VERB('use', "gotoRightRoom", () => {
+        GOTO("RightRoom")
+    })
 })
 
 // // Custom test
