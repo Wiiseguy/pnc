@@ -40,6 +40,7 @@ export class GameActor implements IInteractive {
     y: number;
     imageName: string;
     image: P5.Image;
+    visible: boolean;
     constructor(name: string, x: number, y: number, imageName: string) {
         this.name = name;
         this.initialX = x;
@@ -48,6 +49,7 @@ export class GameActor implements IInteractive {
         this.y = y;
         this.imageName = imageName;
         this.actions = [];
+        this.visible = true;
     }
 }
 

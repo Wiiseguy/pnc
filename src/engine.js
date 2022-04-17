@@ -155,12 +155,14 @@ globalThis.GOTO = function (room) {
     currentRoom = gameInfo.rooms.find(r => r.name == room)
 };
 
-globalThis.SHOWACTOR = function () {
-    unimplemented('SHOWACTOR', ...arguments)
+globalThis.SHOWACTOR = function (name) {
+    let actor = getRoomActor(name);
+    if(actor) actor.visible = true;
 };
 
-globalThis.HIDEACTOR = function () {
-    unimplemented('HIDEACTOR', ...arguments)
+globalThis.HIDEACTOR = function (name) {
+    let actor = getRoomActor(name);
+    if(actor) actor.visible = false;
 };
 
 globalThis.MOVEACTOR = function () {
@@ -190,11 +192,20 @@ function getImageByName(name) {
     return image;
 }
 
+function getActionByNameOrWildcard(actions, name) {
+    return actions?.find(a => a.name === name || a.name === '*')
+}
+
+function getRoomActor(name) {
+    return currentRoom.actors.find(a => a.name === name)
+}
+
 function initializeActor(actor) {
     actor.image = getImageByName(actor.imageName);
 }
 
 function drawActor(actor) {
+    if(!actor.visible) return;
     P5.image(actor.image.image, actor.x, actor.y)
 }
 
@@ -212,7 +223,7 @@ function initialize() {
 
         for (let a of currentRoom.actors) {
             if (P5.mouseX >= a.x && P5.mouseX <= a.x + a.image.image.width && P5.mouseY >= a.y && P5.mouseY <= a.y + a.image.image.height) {
-                action = a.actions?.find(a => a.name === currentVerb);
+                action = getActionByNameOrWildcard(a.actions, currentVerb);
                 if (action) break; // Quit looking and break from for loop
             }
         }
@@ -221,7 +232,7 @@ function initialize() {
         if (!action) {
             for(let h of currentRoom.hotspots) {
                 if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
-                    action = h.actions?.find(a => a.name === currentVerb);
+                    action = getActionByNameOrWildcard(h.actions, currentVerb);
                     if (action) break; // Quit looking and break from for loop
                 }
             }
