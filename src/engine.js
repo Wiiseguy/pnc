@@ -49,18 +49,18 @@ class GameInfo {
     }
 }
 
-const g_GameInfo = new GameInfo();
+const gameInfo = new GameInfo();
 let currentRoomDef = null;
 let currentRoom = null;
 let isMouseDown = false;
 
 
 globalThis.NAME = function (name) {
-    g_GameInfo.name = name;
+    gameInfo.name = name;
 }
 
 globalThis.AUTHOR = function (name) {
-    g_GameInfo.authors.push(name)
+    gameInfo.authors.push(name)
 }
 
 /**
@@ -69,24 +69,24 @@ globalThis.AUTHOR = function (name) {
  * @param {number} height 
  */
 globalThis.SIZE = function (width, height) {
-    g_GameInfo.width = width
-    g_GameInfo.height = height
+    gameInfo.width = width
+    gameInfo.height = height
 }
 
 globalThis.FONTSIZE = function (size) {
-    g_GameInfo.fontSize = size
+    gameInfo.fontSize = size
 }
 
 globalThis.BGCOLOR = function (hexString) {
-    g_GameInfo.bgColor = P5.color(hexString)
+    gameInfo.bgColor = P5.color(hexString)
 }
 
 globalThis.NOINTRO = function () {
-    g_GameInfo.skipIntro = true
+    gameInfo.skipIntro = true
 }
 
 globalThis.STARTROOM = function (room) {
-    g_GameInfo.startRoom = room
+    gameInfo.startRoom = room
 }
 
 globalThis.ACTOR = function (name, def) {
@@ -101,7 +101,7 @@ globalThis.ACTOR = function (name, def) {
     }
     // Otherwise, add the actor to the global list
     else {
-        g_GameInfo.actors.push({
+        gameInfo.actors.push({
             name: name,
             ...def
         });
@@ -110,7 +110,7 @@ globalThis.ACTOR = function (name, def) {
 }
 
 globalThis.IMAGE = function (name, fileName) {
-    g_GameInfo.images.push({
+    gameInfo.images.push({
         name: name,
         fileName: fileName,
         image: null
@@ -118,7 +118,7 @@ globalThis.IMAGE = function (name, fileName) {
 }
 
 globalThis.ANIMATION = function (name, img, speed, def) {
-    g_GameInfo.animations.push({
+    gameInfo.animations.push({
         name: name,
         img: img,
         speed: speed,
@@ -127,7 +127,7 @@ globalThis.ANIMATION = function (name, img, speed, def) {
 }
 
 globalThis.SOUND = function (name, fileName) {
-    g_GameInfo.sounds.push({
+    gameInfo.sounds.push({
         name: name,
         fileName: fileName,
         sound: null
@@ -135,7 +135,7 @@ globalThis.SOUND = function (name, fileName) {
 }
 
 globalThis.ROOM = function (name, def) {
-    g_GameInfo.rooms.push({
+    gameInfo.rooms.push({
         name: name,
         roomInitFn: def,
         description: '',
@@ -176,7 +176,7 @@ globalThis.ENTER = function (action) {
  * @param {function(CustomContext)} fn 
  */
 globalThis.CUSTOM_INIT = function (fn) {
-    g_GameInfo.customInit.push(fn)
+    gameInfo.customInit.push(fn)
 }
 
 /**
@@ -184,20 +184,34 @@ globalThis.CUSTOM_INIT = function (fn) {
  * @param {function(CustomContext)} fn 
  */
 globalThis.CUSTOM_DRAW = function (fn) {
-    g_GameInfo.customDraw.push(fn)
+    gameInfo.customDraw.push(fn)
+}
+
+function getImageByName(name) {
+    let image = gameInfo.images.find(img => img.name === name);
+    if (!image) throw new Error(`Image with name ${name} not found`);
+    return image;
+}
+
+function initializeActor(actor) {
+    actor.image = getImageByName(actor.image);
+}
+
+function drawActor(actor) {
+    P5.image(actor.image.image, actor.x, actor.y)
 }
 
 function initialize() {
-    console.log("GameInfo:", g_GameInfo)
+    console.log("GameInfo:", gameInfo)
 
-    const canvas = P5.createCanvas(g_GameInfo.width, g_GameInfo.height);
+    const canvas = P5.createCanvas(gameInfo.width, gameInfo.height);
 
     canvas.mousePressed(e => {
         isMouseDown = true;
 
         currentRoom.hotspots.forEach(h => {
             if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
-                currentRoom = g_GameInfo.rooms[1];
+                currentRoom = gameInfo.rooms[1];
             }
         })
     });
@@ -208,49 +222,45 @@ function initialize() {
 
     const context = new CustomContext({
         p5: P5,
-        gameInfo: g_GameInfo,
-        canvas
+        gameInfo: gameInfo,
+        canvas: canvas
     })
 
     // Initialize rooms
-    g_GameInfo.rooms.forEach(r => {
+    gameInfo.rooms.forEach(r => {
         currentRoomDef = r;
         r.roomInitFn();
-        r.backgroundImage = g_GameInfo.images.find(i => i.name == r.background).image
+        r.backgroundImage = getImageByName(r.background);
 
-        r.actors.forEach(a => {
-            a.image = g_GameInfo.images.find(i => i.name == a.image).image
-        })
+        r.actors.forEach(initializeActor)
 
         console.log("Handled room: " + r.name, r)
     })
 
-    g_GameInfo.actors.forEach(ga => {
-        ga.image = g_GameInfo.images.find(i => i.name == ga.image).image
-    })
+    gameInfo.actors.forEach(initializeActor)
 
     P5.background("#000000")
     P5.stroke(0)
     P5.fill("#eeeeee")
-    P5.textSize(g_GameInfo.fontSize);
+    P5.textSize(gameInfo.fontSize);
     P5.textAlign(P5.CENTER, P5.CENTER);
 
     // Draw the Game title and author(s) unless NOINTRO() is used.
-    if (!g_GameInfo.skipIntro) {
-        P5.text(g_GameInfo.name, 0, 0, g_GameInfo.width, g_GameInfo.height, "center", "center")
-        P5.textSize(g_GameInfo.fontSize * 0.75);
-        if (g_GameInfo.authors != "") P5.text("by " + g_GameInfo.authors.join(" & "), 0, g_GameInfo.fontSize, g_GameInfo.width, g_GameInfo.height)
-        P5.textSize(g_GameInfo.fontSize);
+    if (!gameInfo.skipIntro) {
+        P5.text(gameInfo.name, 0, 0, gameInfo.width, gameInfo.height, "center", "center")
+        P5.textSize(gameInfo.fontSize * 0.75);
+        if (gameInfo.authors.length != 0) P5.text("by " + gameInfo.authors.join(" & "), 0, gameInfo.fontSize, gameInfo.width, gameInfo.height)
+        P5.textSize(gameInfo.fontSize);
     }
 
     // Call custom init functions
-    g_GameInfo.customInit.forEach(fn => {
+    gameInfo.customInit.forEach(fn => {
         fn(context)
     })
 
     P5.draw = _ => {
         // Draw Background
-        P5.image(currentRoom.backgroundImage, 0, 0)
+        P5.image(currentRoom.backgroundImage.image, 0, 0)
 
         // Draw Hotspots (DEBUG)
         currentRoom.hotspots.forEach(h => {
@@ -266,25 +276,21 @@ function initialize() {
         })
 
         // Draw Current Room Actors
-        currentRoom.actors.forEach(a => {
-            P5.image(a.image, a.x, a.y)
-        })
+        currentRoom.actors.forEach(drawActor)
 
         // Draw Global Actors
-        g_GameInfo.actors.forEach(a => {
-            P5.image(a.image, a.x, a.y)
-        })
+        gameInfo.actors.forEach(drawActor)
 
         // Call custom draw functions
-        g_GameInfo.customDraw.forEach(fn => {
+        gameInfo.customDraw.forEach(fn => {
             fn(context)
         })
     }
 
     // Set Start Room, or fall back to first room
-    currentRoom = g_GameInfo.rooms.find(r => r.name == g_GameInfo.startRoom)
+    currentRoom = gameInfo.rooms.find(r => r.name == gameInfo.startRoom)
     if (!currentRoom) {
-        currentRoom = g_GameInfo.rooms[0]
+        currentRoom = gameInfo.rooms[0]
     }
 
     // Initialization complete
@@ -296,12 +302,12 @@ P5.preload = function () {
 
     // Preload images
     // by doing this inside p5's preload(), setup() won't be called until all assets are loaded
-    g_GameInfo.images.forEach(img => {
+    gameInfo.images.forEach(img => {
         img.image = P5.loadImage(img.fileName);
     })
 
     // Preload sounds
-    g_GameInfo.sounds.forEach(sound => {
+    gameInfo.sounds.forEach(sound => {
         sound.sound = P5.loadSound(sound.fileName);
     })
 }
