@@ -67,7 +67,7 @@ ROOM("LeftRoom", () => {
         image: "Shelf"
     })
 
-    VERB('look', "TestActor", () => {
+    VERB('*', "TestActor", () => {
         SHOWTEXT("A TestActor")
     })
 

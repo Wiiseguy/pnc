@@ -181,6 +181,10 @@ function getImageByName(name) {
     return image;
 }
 
+function getActionByNameOrWildcard(actions, name) {
+    return actions?.find(a => a.name === name || a.name === '*')
+}
+
 function initializeActor(actor) {
     actor.image = getImageByName(actor.imageName);
 }
@@ -203,7 +207,7 @@ function initialize() {
 
         for (let a of currentRoom.actors) {
             if (P5.mouseX >= a.x && P5.mouseX <= a.x + a.image.image.width && P5.mouseY >= a.y && P5.mouseY <= a.y + a.image.image.height) {
-                action = a.actions?.find(a => a.name === currentVerb);
+                action = getActionByNameOrWildcard(a.actions, currentVerb);
                 if (action) break; // Quit looking and break from for loop
             }
         }
@@ -212,7 +216,7 @@ function initialize() {
         if (!action) {
             for(let h of currentRoom.hotspots) {
                 if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
-                    action = h.actions?.find(a => a.name === currentVerb);
+                    action = getActionByNameOrWildcard(h.actions, currentVerb);
                     if (action) break; // Quit looking and break from for loop
                 }
             }
