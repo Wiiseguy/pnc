@@ -252,16 +252,6 @@ function initialize() {
         // Draw Background
         P5.image(currentRoom.backgroundImage, 0, 0)
 
-        // Draw Current Room Actors
-        currentRoom.actors.forEach(a => {
-            P5.image(a.image, a.x, a.y)
-        })
-
-        // Draw Global Actors
-        g_GameInfo.actors.forEach(a => {
-            P5.image(a.image, a.x, a.y)
-        })
-
         // Draw Hotspots (DEBUG)
         currentRoom.hotspots.forEach(h => {
             P5.push()
@@ -273,6 +263,16 @@ function initialize() {
             P5.textAlign("right","bottom")
             P5.text(h.name,h.x2,h.y2)
             P5.pop()
+        })
+
+        // Draw Current Room Actors
+        currentRoom.actors.forEach(a => {
+            P5.image(a.image, a.x, a.y)
+        })
+
+        // Draw Global Actors
+        g_GameInfo.actors.forEach(a => {
+            P5.image(a.image, a.x, a.y)
         })
 
         // Call custom draw functions

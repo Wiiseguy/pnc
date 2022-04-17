@@ -1,31 +1,27 @@
 const PNC = require('./engine.js');
 
-NAME("James Bond's Amazing Adventure!")
+NAME("PNC Test Adventure")
 AUTHOR("Chronic")
 AUTHOR("Wiiseguy")
 SIZE(640, 400)
 FONTSIZE(32)
 //NOINTRO()
 
-STARTROOM("firstRoom")
+STARTROOM("LeftRoom")
 
-//IMAGE("iIntroWalkStrip", "anim-walks.jpg")
-IMAGE("bgCrossroads", require('url:./data/James/Crossroads/bgCrossroads.png'))
-IMAGE("ijamesGun", require('url:./data/James/Crossroads/jamesGun.png'))
-IMAGE("ijamesGun2", require('url:./data/James/Crossroads/jamesGun2.png'))
+// Room - Left Room
+IMAGE("LeftRoomBG", require('url:./data/TestAdv/LeftRoom/LeftRoomBG.png'))
+IMAGE("TestActor", require('url:./data/TestAdv/LeftRoom/TestActor.png'))
 
-IMAGE("roomColor", require('url:./data/James/BondResidence/roomColor.png'))
-// Spoken samples
-
-// Music
+// Room - Right Room
+IMAGE("RightRoomBG", require('url:./data/TestAdv/RightRoom/RightRoomBG.png'))
 
 // Sound effects and stuff
 SOUND("menu", require("url:./data/menu.wav"))
 
 // Global vars (just normal js vars)
-var hasGateKey = false
-var HGateLocked = true
-
+var hasTestActorMoved = false
+var hasCheese = false
 
 // Animations
 ANIMATION("iBatFlap", "iBatStrip", 200, [
@@ -33,69 +29,67 @@ ANIMATION("iBatFlap", "iBatStrip", 200, [
     [25, 0, 49, 19],
 ])
 
-ACTOR("someGlobalActor", {
-    x: 490,
-    y: 320,
-    image: 'ijamesGun2'
-})
+// ACTOR("someGlobalActor", {
+//     x: 490,
+//     y: 320,
+//     image: 'globalActor'
+// })
 
-ROOM("firstRoom", () => {
+/*
+    Left Room Puzzle:
+        TestActor is in the way of the closet door, A mouse needs to be lured out
+        of the mousehole to scare TestActor out of the room.
+*/
 
-    BACKGROUND("bgCrossroads")
-    DESCRIPTION("Crossroads")
+ROOM("LeftRoom", () => {
+    BACKGROUND("LeftRoomBG")
 
-    HOTSPOT("sign1", 150, 60, 270, 130)
-    HOTSPOT("sign2",290, 70, 420, 130)
-
-    ACTOR("james", {
-        x: 150,
-        y: 165,
-        image: "ijamesGun"
-    })
-
-    VERB('look', "sign1", () => {
-        SHOWTEXT("The Bond Residence?")
-        WAIT(1300)
-        SHOWTEXT("I wonder where this path will take me!")
-
-        PlayPong()
-    })
-
-    VERB('use', "sign1", () => {
-        MOVEACTOR("james", -277, 165, 1000, true) // last param is wait
-        GOTO("roomA")
-    })
+    HOTSPOT("gotoCloset", 347, 114, 442, 307)
+    HOTSPOT("mouseHole",175, 290, 195, 310)
+    HOTSPOT("gotoRightRoom",610, 0, 640, 400)
 
     ENTER(() => {
         LOOPSOUND("theme1")
-        MOVEACTOR("james", 150, 165)
-        CHANGEIMAGE("james", ijamesGun)
     })
 
-    function PlayPong() {
-        SHOWACTOR("pongBat")
-        // etc.
-        SHOWTEXT("YIPES!!!")
+    ACTOR("TestActor", {
+        x: 360,
+        y: 160,
+        image: "TestActor"
+    })
+
+    VERB('look', "mouseHole", () => {
+        SHOWTEXT("I think i hear something moving around in there")
+        WAIT(1300)
+        LookAtMouseHole()
+    })
+
+    VERB('use', "mouseHole", () => {
+        if (hasCheese) {
+            SHOWTEXT("Maybe the little thing likes cheese")
+            WAIT(1000)
+            SHOWACTOR("Cheese")
+            WAIT(1000)
+            SHOWACTOR("MouseSmall")
+            WAIT(500)
+            SHOWTEXT("AHH! A MOUSE!!")
+            MOVEACTOR("TestActor", 700, 160, 1000, true) // last param is wait
+        }
+        else {
+            SHOWTEXT("I don't think i should put my hand in here, it looks hungry.")
+        }
+    })
+
+    function LookAtMouseHole() {
+        SHOWACTOR("MouseLarge")
+        SHOWTEXT("Holy... That thing is huge!")
     }
 })
 
 
-ROOM("otherroom", () => {
-
-    BACKGROUND("roomColor")
-    DESCRIPTION("Crossroads")
-
-    HOTSPOT("sign1", 150, 60, 270, 130)
-    HOTSPOT("sign2",290, 70, 420, 130)
-
-    ACTOR("james", {
-        x: 150,
-        y: 165,
-        image: "ijamesGun2"
-    })
+ROOM("RightRoom", () => {
+    BACKGROUND("RightRoomBG")
 })
-
-
 
 // // Custom test
 // let radius = 50;
