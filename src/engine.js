@@ -239,7 +239,7 @@ function initialize() {
     if (!g_GameInfo.skipIntro) {
         P5.text(g_GameInfo.name, 0, 0, g_GameInfo.width, g_GameInfo.height, "center", "center")
         P5.textSize(g_GameInfo.fontSize * 0.75);
-        if (g_GameInfo.authors != "") P5.text("by " + g_GameInfo.authors.join(" & "), 0, g_GameInfo.fontSize, g_GameInfo.width, g_GameInfo.height)
+        if (g_GameInfo.authors.length != 0) P5.text("by " + g_GameInfo.authors.join(" & "), 0, g_GameInfo.fontSize, g_GameInfo.width, g_GameInfo.height)
         P5.textSize(g_GameInfo.fontSize);
     }
 
