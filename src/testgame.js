@@ -30,6 +30,7 @@ IMAGE("Cheese", require('url:./data/TestAdv/KitchenRoom/Cheese.png'))
 // Sound effects and stuff
 SOUND("menu", require("url:./data/menu.wav"))
 SOUND("kitchen", require("url:./data/62215.wav"))
+SOUND("bg", require("url:./data/chill.mp3"), {volume: 0.5}) // Credit: https://www.looperman.com/loops/detail/289801/lenoxbeatmaker-sativaskunk-free-146bpm-jazz-electric-guitar-loop
 
 // Global vars (just normal js vars)
 var hasTestActorMoved = false
@@ -55,6 +56,8 @@ ROOM("LeftRoom", () => {
         of the mousehole to scare TestActor out of the room.
 */
 
+    let hasEntered = false;
+
     BACKGROUND("LeftRoomBG")
 
     HOTSPOT("gotoCloset", 347, 114, 442, 307)
@@ -62,7 +65,12 @@ ROOM("LeftRoom", () => {
     HOTSPOT("mouseHole",175, 290, 195, 310)
 
     ENTER(() => {
-        PLAYSOUND("menu")
+        if (!hasEntered) {
+            hasEntered = true;
+            LOOPSOUND("bg", {
+                rate: 0.9 + Math.random() / 5
+            })
+        }
     })
 
     ACTOR("TestActor", {
@@ -79,11 +87,13 @@ ROOM("LeftRoom", () => {
 
     VERB('*', "TestActor", () => {
         SHOWTEXT("A TestActor")
+        PLAYSOUND("kitchen", { rate: 0.5 + Math.random() })
     })
 
     VERB('look', "mouseHole", () => {
         SHOWTEXT("I think i hear something moving around in there")
         WAIT(1300)
+        LOOPSOUND("kitchen")
         LookAtMouseHole()
     })
 

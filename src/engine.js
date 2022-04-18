@@ -1,7 +1,8 @@
+const { SoundFile } = require("p5");
 const p5 = require("p5");
 globalThis.p5 = p5;
 const p5sound = require("p5/lib/addons/p5.sound");
-const { GameInfo, CustomContext, GameHotspot, GameRoom, GameAction, GameActor } = require("./engine.core");
+const { GameInfo, CustomContext, GameHotspot, GameRoom, GameAction, GameActor, GameSound } = require("./engine.core");
 
 const P5 = new p5(() => 1337);
 globalThis.P5 = P5;
@@ -55,7 +56,7 @@ globalThis.ACTOR = function (name, def) {
     let actor = new GameActor(name, def.x, def.y, def.image);
 
     // If we're current handling room defs, add the actor to the current room
-    if (currentRoomDef) {        
+    if (currentRoomDef) {
         currentRoomDef.actors.push(actor);
         console.log("[ACTOR]: ", name, def, actor)
 
@@ -84,12 +85,20 @@ globalThis.ANIMATION = function (name, img, speed, def) {
     });
 }
 
-globalThis.SOUND = function (name, fileName) {
-    gameInfo.sounds.push({
+globalThis.SOUND = function (name, fileName, options) {
+    options = {
+        volume: 1,
+        ...options
+    };
+    console.log(options)
+
+    let sound = new GameSound({
         name: name,
         fileName: fileName,
         sound: null
-    });
+    })
+    sound.defaultVolume = options.volume;
+    gameInfo.sounds.push(sound);
 }
 
 globalThis.ROOM = function (name, def) {
@@ -157,22 +166,50 @@ globalThis.GOTO = function (room) {
 };
 globalThis.SHOWACTOR = function (name) {
     let actor = getRoomActor(name);
-    if(actor) actor.visible = true;
+    if (actor) actor.visible = true;
 };
 globalThis.HIDEACTOR = function (name) {
     let actor = getRoomActor(name);
-    if(actor) actor.visible = false;
+    if (actor) actor.visible = false;
 };
 globalThis.MOVEACTOR = function () {
     unimplemented('MOVEACTOR', ...arguments)
 };
 
-globalThis.PLAYSOUND = function (name) {
-    let sound = gameInfo.sounds.find(s => s.name === name);
-    sound?.sound.play()
+globalThis.PLAYSOUND = function (name, options) {
+    let sound = getSound(name);
+    options = {
+        volume: sound.defaultVolume ?? 1,
+        rate: 1,
+        delay: 0,
+        start: 0,
+        duration: undefined,
+        ...options
+    };
+    
+    sound.sound.setLoop(false)
+    sound.sound.stop()
+    sound.sound.play(options.delay, options.rate, options.volume, options.start, options.duration)
 };
-globalThis.LOOPSOUND = function () {
-    unimplemented('LOOPSOUND', ...arguments)
+
+globalThis.STOPSOUND = function (name) {
+    let sound = getSound(name);
+    sound.sound.stop()
+};
+globalThis.LOOPSOUND = function (name, options) {
+    let sound = getSound(name);
+    options = {
+        volume: sound.defaultVolume ?? 1,
+        rate: 1,
+        delay: 0,
+        start: 0,
+        duration: undefined,
+        ...options
+    };
+    console.log(options, sound)
+    sound.sound.pause()
+    sound.sound.stop()
+    sound.sound.loop(options.delay, options.rate, options.volume, options.start, options.duration)
 };
 
 /**
@@ -192,7 +229,7 @@ globalThis.CUSTOM_DRAW = function (fn) {
 }
 
 
-function setRoom(room) {    
+function setRoom(room) {
     if (!room) {
         console.error('Room not found:', room)
         return;
@@ -201,10 +238,17 @@ function setRoom(room) {
     currentRoom.onEnter();
 }
 
-function getImageByName(name) {
+function getImage(name) {
     let image = gameInfo.images.find(img => img.name === name);
     if (!image) throw new Error(`Image with name ${name} not found`);
     return image;
+}
+
+/** @type {SoundFile} */
+function getSound(name) {
+    let sound = gameInfo.sounds.find(s => s.name === name);
+    if (!sound) throw new Error(`Sound with name ${name} not found`);
+    return sound;
 }
 
 function getActionByNameOrWildcard(actions, name) {
@@ -216,11 +260,11 @@ function getRoomActor(name) {
 }
 
 function initializeActor(actor) {
-    actor.image = getImageByName(actor.imageName);
+    actor.image = getImage(actor.imageName);
 }
 
 function drawActor(actor) {
-    if(!actor.visible) return;
+    if (!actor.visible) return;
     P5.image(actor.image.image, actor.x, actor.y)
 }
 
@@ -237,6 +281,7 @@ function initialize() {
         let action = null;
 
         for (let a of currentRoom.actors) {
+            if (!a.visible) continue; // Skip to next if actor is not visible
             if (P5.mouseX >= a.x && P5.mouseX <= a.x + a.image.image.width && P5.mouseY >= a.y && P5.mouseY <= a.y + a.image.image.height) {
                 action = getActionByNameOrWildcard(a.actions, currentVerb);
                 if (action) break; // Quit looking and break from for loop
@@ -245,7 +290,7 @@ function initialize() {
 
         // If no actor actions were found, try hotspots
         if (!action) {
-            for(let h of currentRoom.hotspots) {
+            for (let h of currentRoom.hotspots) {
                 if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
                     action = getActionByNameOrWildcard(h.actions, currentVerb);
                     if (action) break; // Quit looking and break from for loop
@@ -257,7 +302,7 @@ function initialize() {
             console.group("Action", action)
             action.action();
             console.groupEnd('Action')
-        } 
+        }
     });
 
     canvas.mouseReleased(e => {
@@ -268,7 +313,7 @@ function initialize() {
     canvas.elt.addEventListener('contextmenu', e => {
         // Disables context menu from appearing
         e.preventDefault();
-        
+
         // Change the current verb
         let currentVerbIndex = verbs.indexOf(currentVerb);
         let newCurrentVerbIndex = (currentVerbIndex + 1) % verbs.length;
@@ -287,7 +332,7 @@ function initialize() {
         currentRoomDef = r;
         r.roomInitFn();
         if (r.background) {
-            r.backgroundImage = getImageByName(r.background);
+            r.backgroundImage = getImage(r.background);
         }
 
         r.actors.forEach(initializeActor)
@@ -339,14 +384,14 @@ function initialize() {
             if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
                 P5.fill(255, 0, 0, 128)
             }
-            
+
             P5.rect(h.x1, h.y1, h.x2 - h.x1, h.y2 - h.y1)
             P5.fill(200)
-            
-            
+
+
             P5.textSize(16)
-            P5.textAlign("right","bottom")
-            P5.text(h.name,h.x2,h.y2)
+            P5.textAlign("right", "bottom")
+            P5.text(h.name, h.x2, h.y2)
             P5.pop()
         })
 
@@ -365,10 +410,10 @@ function initialize() {
         // Temp, draw current verb, etc.
         P5.push();
         P5.noStroke();
-        P5.fill(255,0,0)
+        P5.fill(255, 0, 0)
         P5.textSize(24)
-        P5.textAlign("left","center")
-        P5.text(currentVerb, 10, 2 + (gameInfo.fontSize/2))
+        P5.textAlign("left", "center")
+        P5.text(currentVerb, 10, 2 + (gameInfo.fontSize / 2))
         P5.pop();
     }
 

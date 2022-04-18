@@ -1,4 +1,5 @@
-import P5 from "p5";
+import p5 from "p5";
+import P5, { Phrase } from "p5";
 import "p5/lib/addons/p5.sound";
 
 
@@ -30,6 +31,17 @@ interface IInteractive {
     actions: GameAction[];
 }
 
+export class GameSound {
+    name = "";
+    fileName = "";
+    sound: p5.SoundFile = null;
+    defaultVolume: number = 1;
+    constructor(s) {
+        this.sound = s.sound;
+        this.name = s.name;
+        this.fileName = s.fileName;
+    }
+}
 
 export class GameActor implements IInteractive {
     name: string;
@@ -93,8 +105,7 @@ export class GameRoom {
 export class GameInfo {
     version = 1;
     name = "";
-    /** @type {string[]} */
-    authors = [];
+    authors: string[] = [];
     copyright = "";
     dateCreated = "";
     dateModified = "";
@@ -102,21 +113,20 @@ export class GameInfo {
     width = 640;
     height = 480;
     fontSize = 16;
-    /** @type {p5.Color} */
-    bgColor = "#000000";
+    bgColor: p5.Color;
     skipIntro = false;
     startRoom = "";
     rooms = [];
-    actors: GameActor[];
+    actors: GameActor[] = [];
     images = [];
-    sounds = [];
+    sounds: GameSound[] = [];
     animations = [];
 
     customInit = [];
     customDraw = [];
 
     constructor() {
-        this.actors = [];        
+        
     }
 }
 
