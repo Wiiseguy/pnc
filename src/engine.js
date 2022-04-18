@@ -9,7 +9,7 @@ globalThis.P5 = P5;
 
 
 const gameInfo = new GameInfo();
-let verbs = ['use', 'look']
+let verbs = ['use']
 
 
 let currentRoomDef = null;

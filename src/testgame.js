@@ -90,13 +90,6 @@ ROOM("LeftRoom", () => {
         PLAYSOUND("kitchen", { rate: 0.5 + Math.random() })
     })
 
-    VERB('look', "mouseHole", () => {
-        SHOWTEXT("I think i hear something moving around in there")
-        WAIT(1300)
-        LOOPSOUND("kitchen")
-        LookAtMouseHole()
-    })
-
     VERB('use', "mouseHole", () => {
         if (hasCheese) {
             SHOWTEXT("Maybe the little thing likes cheese")
