@@ -9,17 +9,17 @@ FONTSIZE(32)
 //NOINTRO()
 BGCOLOR('#ff00ff')
 
-STARTROOM("LeftRoom")
+STARTROOM("HallWay_Left")
 
 // Room - Left Room
-IMAGE("LeftRoomBG", require('url:./data/TestAdv/LeftRoom/LeftRoomBG.png'))
-IMAGE("TestActor", require('url:./data/TestAdv/LeftRoom/TestActor.png'))
-IMAGE("Shelf", require('url:./data/TestAdv/LeftRoom/Shelf.png'))
+IMAGE("HallWay_LeftBG", require('url:./data/TestAdv/HallWay_Left/HallWay_LeftBG.png'))
+IMAGE("TestActor", require('url:./data/TestAdv/HallWay_Left/TestActor.png'))
+IMAGE("Shelf", require('url:./data/TestAdv/HallWay_Left/Shelf.png'))
 
 // Room - Right Room
-IMAGE("RightRoomBG", require('url:./data/TestAdv/RightRoom/RightRoomBG.png'))
-IMAGE("Painting", require('url:./data/TestAdv/RightRoom/Painting.png'))
-IMAGE("WallSafe", require('url:./data/TestAdv/RightRoom/WallSafe.png'))
+IMAGE("HallWay_RightBG", require('url:./data/TestAdv/HallWay_Right/HallWay_RightBG.png'))
+IMAGE("Painting", require('url:./data/TestAdv/HallWay_Right/Painting.png'))
+IMAGE("WallSafe", require('url:./data/TestAdv/HallWay_Right/WallSafe.png'))
 
 // Room - Kitchen
 IMAGE("KitchenBG", require('url:./data/TestAdv/KitchenRoom/KitchenBG.png'))
@@ -29,6 +29,8 @@ IMAGE("Cheese", require('url:./data/TestAdv/KitchenRoom/Cheese.png'))
 
 
 // Sound effects and stuff
+SOUND("TestActorScream", require("url:./data/TestAdv/HallWay_Left/scream.wav"))
+
 SOUND("menu", require("url:./data/menu.wav"))
 SOUND("kitchen", require("url:./data/62215.wav"))
 SOUND("bg", require("url:./data/chill.mp3"), { volume: 0.5 }) // Credit: https://www.looperman.com/loops/detail/289801/lenoxbeatmaker-sativaskunk-free-146bpm-jazz-electric-guitar-loop
@@ -50,33 +52,23 @@ ANIMATION("iBatFlap", "iBatStrip", 200, [
 // })
 
 
-ROOM("LeftRoom", () => {
-    /*
-        Room Puzzle:
-            TestActor is in the way of the closet door, A mouse needs to be lured out
-            of the mousehole to scare TestActor out of the room.
-    */
-
-    let hasEntered = false;
-
-    BACKGROUND("LeftRoomBG")
+/*
+    HallWay_Left Puzzle
+        TestActor is in the way of the closet door, A mouse needs to be lured out
+        of the mousehole with cheese to scare TestActor out of the room.
+*/
+ROOM("HallWay_Left", () => {
+    BACKGROUND("HallWay_LeftBG")
 
     HOTSPOT("gotoCloset", 347, 114, 442, 307)
-    HOTSPOT("gotoRightRoom", 550, 0, 640, 400)
+    HOTSPOT("gotoHallWay_Right", 550, 0, 640, 400)
     HOTSPOT("mouseHole", 175, 290, 195, 310)
-    
-    ACTOR("Cheese", {
-        x: 170,
-        y: 310,
-        image: "Cheese",
-        visible: false
-    })
 
-    ONCE(() => {
-        LOOPSOUND("bg", {
-            rate: 0.9 + Math.random() / 5
-        })
-    })
+    // ONCE(() => {
+    //     LOOPSOUND("bg", {
+    //         rate: 0.9 + Math.random() / 5
+    //     })
+    // })
 
     ACTOR("TestActor", {
         x: 370,
@@ -90,46 +82,58 @@ ROOM("LeftRoom", () => {
         image: "Shelf"
     })
 
-    CLICK("TestActor", () => {
-        PLAYSOUND("kitchen", { rate: 0.5 + Math.random() })
+    ACTOR("Cheese", {
+        x: 170,
+        y: 310,
+        image: "Cheese",
+        visible: false
     })
 
-    CLICK("mouseHole", () => {        
+    CLICK("TestActor", () => {
+        //PLAYSOUND("kitchen", { rate: 0.5 + Math.random() })
+        SHOWTEXT("They don't seem interested in talking to me.")
+    })
+
+    CLICK("mouseHole", () => {
         if (hasCheese) {
-            SHOWTEXT("Maybe the little thing likes cheese")
+            SHOWTEXT("Maybe the little thing likes cheese.")
             SHOWACTOR("Cheese")
             WAIT(1000)
-            SHOWACTOR("MouseSmall")
+            SHOWACTOR("Mouse")
             WAIT(500)
-            PLAYSOUND("kitchen", { rate: 3 })
+            PLAYSOUND("TestActorScream")
             SHOWTEXT("AHH! A MOUSE!!")
-            MOVEACTOR("TestActor", 700, 160, 1000, true, { easing: 'easeInElastic(1, .6)' })
+            MOVEACTOR("TestActor", 700, 160, 2000, true)
+            hasTestActorMoved = true
         }
         else {
-            SHOWTEXT("I don't think i should put my hand in here, it looks hungry.")
+            SHOWTEXT("I hear something moving around in there.")
         }
     })
 
-    CLICK("gotoRightRoom", () => {
-        GOTO("RightRoom")
+    CLICK("gotoCloset", () => {
+        if (hasTestActorMoved) {
+            SHOWTEXT("COMING SOON (TM)")
+        }
+        else {
+            SHOWTEXT("TestActor is in the way")
+        }
     })
 
-    function LookAtMouseHole() {
-        SHOWACTOR("MouseLarge")
-        SHOWTEXT("Holy... That thing is huge!")
-    }
+    CLICK("gotoHallWay_Right", () => {
+        GOTO("HallWay_Right")
+    })
 })
 
 
-ROOM("RightRoom", () => {
-    /*
-        Room Puzzle:
-            Move painting, open safe with code from closet
-    */
+/*
+    HallWay_Right Puzzle
+        Move painting, open safe with code from closet
+*/
+ROOM("HallWay_Right", () => {
+    BACKGROUND("HallWay_RightBG")
 
-    BACKGROUND("RightRoomBG")
-
-    HOTSPOT("gotoLeftRoom", 0, 0, 80, 400)
+    HOTSPOT("gotoHallway_Left", 0, 0, 80, 400)
     HOTSPOT("gotoKitchenRoom", 582, 139, 623, 382)
 
     ACTOR("WallSafe", {
@@ -145,15 +149,16 @@ ROOM("RightRoom", () => {
     })
 
     VERB('use', "WallSafe", () => {
-        HIDEACTOR("LOL")
+        SHOWTEXT("Its not safe any more.. ehehehe")
     })
 
     CLICK("Painting", () => {
-        HIDEACTOR("Painting")
+        MOVEACTOR("Painting", 266, 185, 10, true)
+        SHOWTEXT("Whoops!")
     })
 
-    CLICK("gotoLeftRoom", () => {
-        GOTO("LeftRoom")
+    CLICK("gotoHallway_Left", () => {
+        GOTO("HallWay_Left")
     })
 
     CLICK("gotoKitchenRoom", () => {
@@ -163,9 +168,13 @@ ROOM("RightRoom", () => {
 
 
 ROOM("KitchenRoom", () => {
+    /*
+        Kitchen Puzzle
+            TBD
+    */
     BACKGROUND("KitchenBG")
 
-    HOTSPOT("gotoRightRoom", 14, 135, 54, 387)
+    HOTSPOT("gotoHallWay_Right", 14, 135, 54, 387)
 
     ACTOR("FridgeDoorClosed", {
         x: 101,
@@ -176,17 +185,19 @@ ROOM("KitchenRoom", () => {
     ACTOR("FridgeDoorOpen", {
         x: 71,
         y: 210,
-        image: "FridgeDoorOpen"
+        image: "FridgeDoorOpen",
+        visible: false
     })
 
     ACTOR("Cheese", {
         x: 126,
         y: 229,
-        image: "Cheese"
+        image: "Cheese",
+        visible: false
     })
 
-    CLICK("gotoRightRoom", () => {
-        GOTO("RightRoom")
+    CLICK("gotoHallWay_Right", () => {
+        GOTO("HallWay_Right")
     })
 
     CLICK("FridgeDoorClosed", () => {
@@ -206,13 +217,6 @@ ROOM("KitchenRoom", () => {
     VERB('use', "Cheese", () => {
         HIDEACTOR("Cheese")
         hasCheese = true
-    })
-
-    ENTER(() => {
-        //PLAYSOUND("kitchen")
-        SHOWACTOR("FridgeDoorClosed")
-        HIDEACTOR("FridgeDoorOpen")
-        HIDEACTOR("Cheese")
     })
 })
 
