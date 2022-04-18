@@ -11,7 +11,7 @@ globalThis.P5 = P5;
 const gameInfo = new GameInfo();
 let verbs = ['use']
 
-
+let isDebug = false;
 let currentRoomDef = null;
 /** @type {GameRoom} */
 let currentRoom = null;
@@ -24,6 +24,10 @@ globalThis.NAME = function (name) {
 
 globalThis.AUTHOR = function (name) {
     gameInfo.authors.push(name)
+}
+
+globalThis.DEBUG = function () {
+    isDebug = true;
 }
 
 /**
@@ -259,7 +263,9 @@ function getActionByNameOrWildcard(actions, name) {
 }
 
 function getRoomActor(name) {
-    return currentRoom.actors.find(a => a.name === name)
+    let result = currentRoom.actors.find(a => a.name === name)
+    if(!result) console.warn(`Actor ${name} not found in room ${currentRoom.name}`)
+    return result;
 }
 
 function initializeActor(actor) {
@@ -324,6 +330,15 @@ function initialize() {
         return false;
     });
 
+    P5.keyPressed = function (e) {
+        console.log(e);
+
+        if (e.code == 'KeyD') {
+            isDebug = !isDebug;
+            console.log("Debug mode:", isDebug);
+        }
+    }
+
     const context = new CustomContext({
         p5: P5,
         gameInfo: gameInfo,
@@ -372,31 +387,33 @@ function initialize() {
             P5.background(gameInfo.bgColor)
         }
 
-        // Draw Hotspots (DEBUG)
-        currentRoom.hotspots.forEach(h => {
-            P5.push()
-            P5.noStroke()
+        if (isDebug) {
+            // Draw Hotspots (DEBUG)
+            currentRoom.hotspots.forEach(h => {
+                P5.push()
+                P5.noStroke()
 
-            P5.fill(0, 0, 200, 60)
+                P5.fill(0, 0, 200, 60)
 
-            // If the hotspot has an action for the current verb, draw a yellow box
-            if (h.actions.some(a => a.name === currentVerb || a.name === '*')) {
-                P5.fill(200, 200, 0, 128)
-            }
-            // If the hotspot is highlighted by the cursor, draw a red box
-            if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
-                P5.fill(255, 0, 0, 128)
-            }
+                // If the hotspot has an action for the current verb, draw a yellow box
+                if (h.actions.some(a => a.name === currentVerb || a.name === '*')) {
+                    P5.fill(200, 200, 0, 128)
+                }
+                // If the hotspot is highlighted by the cursor, draw a red box
+                if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
+                    P5.fill(255, 0, 0, 128)
+                }
 
-            P5.rect(h.x1, h.y1, h.x2 - h.x1, h.y2 - h.y1)
-            P5.fill(200)
+                P5.rect(h.x1, h.y1, h.x2 - h.x1, h.y2 - h.y1)
+                P5.fill(200)
 
 
-            P5.textSize(16)
-            P5.textAlign("right", "bottom")
-            P5.text(h.name, h.x2, h.y2)
-            P5.pop()
-        })
+                P5.textSize(16)
+                P5.textAlign("right", "bottom")
+                P5.text(h.name, h.x2, h.y2)
+                P5.pop()
+            })
+        }
 
         // Draw Current Room Actors
         currentRoom.actors.forEach(drawActor)
@@ -411,13 +428,15 @@ function initialize() {
 
 
         // Temp, draw current verb, etc.
-        P5.push();
-        P5.noStroke();
-        P5.fill(255, 0, 0)
-        P5.textSize(24)
-        P5.textAlign("left", "center")
-        P5.text(currentVerb, 10, 2 + (gameInfo.fontSize / 2))
-        P5.pop();
+        if (isDebug) {
+            P5.push();
+            P5.noStroke();
+            P5.fill(255, 0, 0)
+            P5.textSize(24)
+            P5.textAlign("left", "center")
+            P5.text(currentVerb, 10, 2 + (gameInfo.fontSize / 2))
+            P5.pop();
+        }
     }
 
     // Set Start Room, or fall back to first room

@@ -5,6 +5,7 @@ AUTHOR("Chronic")
 AUTHOR("Wiiseguy")
 SIZE(640, 400)
 FONTSIZE(32)
+//DEBUG()
 //NOINTRO()
 BGCOLOR('#ff00ff')
 
@@ -190,7 +191,15 @@ ROOM("KitchenRoom", () => {
     CLICK("FridgeDoorClosed", () => {
         HIDEACTOR("FridgeDoorClosed")
         SHOWACTOR("FridgeDoorOpen")
-        SHOWACTOR("Cheese")
+        if (!hasCheese) {
+            SHOWACTOR("Cheese")
+        }
+    })
+
+    CLICK("FridgeDoorOpen", () => {
+        HIDEACTOR("FridgeDoorOpen")
+        SHOWACTOR("FridgeDoorClosed")
+        HIDEACTOR("Cheese")
     })
 
     VERB('use', "Cheese", () => {
