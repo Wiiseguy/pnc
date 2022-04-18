@@ -144,6 +144,9 @@ globalThis.VERB = function (verb, subject, action) {
         return;
     }
     currentRoomDef.verbs.push({ verb, subject, action })
+};
+globalThis.CLICK = function (subject, action) {
+    globalThis.VERB('*', subject, action)
 }
 globalThis.ENTER = function (action) {
     currentRoomDef.onEnter = action;
@@ -377,7 +380,7 @@ function initialize() {
             P5.fill(0, 0, 200, 60)
 
             // If the hotspot has an action for the current verb, draw a yellow box
-            if (h.actions.some(a => a.name === currentVerb)) {
+            if (h.actions.some(a => a.name === currentVerb || a.name === '*')) {
                 P5.fill(200, 200, 0, 128)
             }
             // If the hotspot is highlighted by the cursor, draw a red box

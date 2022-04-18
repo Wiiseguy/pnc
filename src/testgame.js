@@ -85,12 +85,12 @@ ROOM("LeftRoom", () => {
         image: "Shelf"
     })
 
-    VERB('*', "TestActor", () => {
+    CLICK("TestActor", () => {
         SHOWTEXT("A TestActor")
         PLAYSOUND("kitchen", { rate: 0.5 + Math.random() })
     })
 
-    VERB('use', "mouseHole", () => {
+    CLICK("mouseHole", () => {
         if (hasCheese) {
             SHOWTEXT("Maybe the little thing likes cheese")
             WAIT(1000)
@@ -106,7 +106,7 @@ ROOM("LeftRoom", () => {
         }
     })
 
-    VERB('use', "gotoRightRoom", () => {
+    CLICK("gotoRightRoom", () => {
         GOTO("RightRoom")
     })
 
@@ -144,17 +144,17 @@ ROOM("RightRoom", () => {
         HIDEACTOR("LOL")
     })
 
-    VERB('use', "Painting", () => {
+    CLICK("Painting", () => {
         HIDEACTOR("Painting")
     })
 
 
 
-    VERB('use', "gotoLeftRoom", () => {
+    CLICK("gotoLeftRoom", () => {
         GOTO("LeftRoom")
     })
 
-    VERB('use', "gotoKitchenRoom", () => {
+    CLICK("gotoKitchenRoom", () => {
         GOTO("KitchenRoom")
     })
 })
@@ -183,11 +183,11 @@ ROOM("KitchenRoom", () => {
         image: "Cheese"
     })
 
-    VERB('use', "gotoRightRoom", () => {
+    CLICK("gotoRightRoom", () => {
         GOTO("RightRoom")
     })
 
-    VERB('use', "FridgeDoorClosed", () => {
+    CLICK("FridgeDoorClosed", () => {
         HIDEACTOR("FridgeDoorClosed")
         SHOWACTOR("FridgeDoorOpen")
         SHOWACTOR("Cheese")
