@@ -53,7 +53,7 @@ export class GameActor implements IInteractive {
     imageName: string;
     image: P5.Image;
     visible: boolean;
-    constructor(name: string, x: number, y: number, imageName: string) {
+    constructor(name: string, x: number, y: number, imageName: string, visible: boolean) {
         this.name = name;
         this.initialX = x;
         this.initialY = y;
@@ -61,7 +61,7 @@ export class GameActor implements IInteractive {
         this.y = y;
         this.imageName = imageName;
         this.actions = [];
-        this.visible = true;
+        this.visible = visible ?? true;
     }
 }
 

@@ -64,6 +64,13 @@ ROOM("LeftRoom", () => {
     HOTSPOT("gotoCloset", 347, 114, 442, 307)
     HOTSPOT("gotoRightRoom", 550, 0, 640, 400)
     HOTSPOT("mouseHole", 175, 290, 195, 310)
+    
+    ACTOR("Cheese", {
+        x: 170,
+        y: 310,
+        image: "Cheese",
+        visible: false
+    })
 
     ENTER(() => {
         if (!hasEntered) {
@@ -94,7 +101,6 @@ ROOM("LeftRoom", () => {
     CLICK("mouseHole", () => {
         if (hasCheese) {
             SHOWTEXT("Maybe the little thing likes cheese")
-            WAIT(1000)
             SHOWACTOR("Cheese")
             WAIT(1000)
             SHOWACTOR("MouseSmall")

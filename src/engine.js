@@ -62,7 +62,7 @@ globalThis.STARTROOM = function (room) {
 }
 
 globalThis.ACTOR = function (name, def) {
-    let actor = new GameActor(name, def.x, def.y, def.image);
+    let actor = new GameActor(name, def.x, def.y, def.image, def.visible);
 
     // If we're current handling room defs, add the actor to the current room
     if (currentRoomDef) {
