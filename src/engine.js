@@ -1,3 +1,4 @@
+const anime = require("animejs").default;
 const { SoundFile } = require("p5");
 const p5 = require("p5");
 globalThis.p5 = p5;
@@ -60,6 +61,7 @@ globalThis.NOINTRO = function () {
 globalThis.STARTROOM = function (room) {
     gameInfo.startRoom = room
 }
+
 
 globalThis.ACTOR = function (name, def) {
     let actor = new GameActor(name, def.x, def.y, def.image, def.visible);
@@ -173,18 +175,18 @@ function _runNextAction(duration) {
     }
     setTimeout(() => {
         let action = actionQueue.shift();
-        if (!action.duration && actionQueue.length === 0) {            
+        if (!action.duration && actionQueue.length === 0) {
             isActionRunning = false;
         }
         console.log("Running action:", action.name, action.duration)
         action.fn();
-        _runNextAction(action.duration ?? 0);        
+        _runNextAction(action.duration ?? 0);
     }, duration);
 }
 function _runActions() {
     isActionRunning = true;
     console.log("Running actions:", actionQueue.map(a => a.name + ' (' + a.duration + 'ms)'))
-    _runNextAction(0);    
+    _runNextAction(0);
 }
 function runActions() {
     // Debounce
@@ -214,12 +216,11 @@ globalThis.SHOWTEXT = function (text) {
 }
 globalThis.WAIT = function (ms) {
     addAction('Wait', () => {
-       // Nothing
+        // Nothing
     }, ms)
 };
 globalThis.GOTO = function (room) {
     addAction('GotoRoom', () => {
-        console.log("GotoRoom:", room)	
         actionQueue.length = 0; // Remove everything queued up
         let r = gameInfo.rooms.find(r => r.name == room)
         setRoom(r)
@@ -227,20 +228,29 @@ globalThis.GOTO = function (room) {
 };
 globalThis.SHOWACTOR = function (name) {
     addAction('ShowActor', () => {
-        console.log("ShowActor:", name)
         let actor = getRoomActor(name);
         if (actor) actor.visible = true;
     })
 };
 globalThis.HIDEACTOR = function (name) {
     addAction('HideActor', () => {
-        console.log("HideActor:", name)
         let actor = getRoomActor(name);
         if (actor) actor.visible = false;
     })
 };
-globalThis.MOVEACTOR = function () {
-    unimplemented('MOVEACTOR', ...arguments)
+globalThis.MOVEACTOR = function (name, x, y, duration, wait = false) {
+    addAction('MoveActor', () => {
+        let actor = getRoomActor(name);
+        if (actor) {
+            anime({
+                targets: actor,
+                x: x,
+                y: y,
+                easing: 'linear',
+                round: 1
+            });
+        }
+    }, wait ? 0 : duration)
 };
 globalThis.PLAYSOUND = function (name, options) {
     addAction('PlaySound', () => {

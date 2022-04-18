@@ -94,7 +94,6 @@ ROOM("LeftRoom", () => {
     })
 
     CLICK("TestActor", () => {
-        SHOWTEXT("A TestActor")
         PLAYSOUND("kitchen", { rate: 0.5 + Math.random() })
     })
 
