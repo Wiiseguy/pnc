@@ -254,7 +254,11 @@ globalThis.TOGGLEACTOR = function (name) {
         if (actor) actor.visible = !actor.visible;
     })
 };
-globalThis.MOVEACTOR = function (name, x, y, duration, wait = false) {
+globalThis.MOVEACTOR = function (name, x, y, duration, wait = false, options) {
+    options = {
+        easing: 'linear',
+        ...options
+    }
     addAction('MoveActor', () => {
         let actor = getRoomActor(name);
         if (actor) {
@@ -262,8 +266,7 @@ globalThis.MOVEACTOR = function (name, x, y, duration, wait = false) {
                 targets: actor,
                 x: x,
                 y: y,
-                easing: 'linear',
-                round: 1
+                easing: options.easing,
             });
         }
     }, wait ? 0 : duration)

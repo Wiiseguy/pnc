@@ -2,7 +2,6 @@
   "name": "pnc",
   "version": "0.1.0",
   "description": "PNC - Point 'N Click",
-  "main": "index.js",
   "directories": {
     "doc": "docs"
   },
@@ -10,6 +9,7 @@
     "test": "aqa *.tests.js",
     "test:watch": "aqa *.tests.js --watch",
     "run-dev": "parcel src/test.html --no-cache --open",
+    "build": "parcel build src/test.html",
     "install-packages": "npm i"
   },
   "repository": {

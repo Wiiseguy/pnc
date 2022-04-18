@@ -94,15 +94,16 @@ ROOM("LeftRoom", () => {
         PLAYSOUND("kitchen", { rate: 0.5 + Math.random() })
     })
 
-    CLICK("mouseHole", () => {
+    CLICK("mouseHole", () => {        
         if (hasCheese) {
             SHOWTEXT("Maybe the little thing likes cheese")
             SHOWACTOR("Cheese")
             WAIT(1000)
             SHOWACTOR("MouseSmall")
             WAIT(500)
+            PLAYSOUND("kitchen", { rate: 3 })
             SHOWTEXT("AHH! A MOUSE!!")
-            MOVEACTOR("TestActor", 700, 160, 1000, true) // last param is wait
+            MOVEACTOR("TestActor", 700, 160, 1000, true, { easing: 'easeInElastic(1, .6)' })
         }
         else {
             SHOWTEXT("I don't think i should put my hand in here, it looks hungry.")
