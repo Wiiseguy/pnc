@@ -18,6 +18,11 @@ let currentRoom = null;
 let currentVerb = verbs[0];
 let isMouseDown = false;
 
+let actionQueue = [];
+let isActionRunning = false;
+
+let currentText = '';
+
 globalThis.NAME = function (name) {
     gameInfo.name = name;
 }
@@ -157,66 +162,126 @@ globalThis.ENTER = function (action) {
 }
 // ACTOR() is defined earlier in this file
 
+
+// ACTIONS
+let startActionTimeout = null;
+function _runNextAction(duration) {
+    if (actionQueue.length === 0) {
+        isActionRunning = false;
+        console.log("Ran all actions.")
+        return;
+    }
+    setTimeout(() => {
+        let action = actionQueue.shift();
+        if (!action.duration && actionQueue.length === 0) {            
+            isActionRunning = false;
+        }
+        console.log("Running action:", action.name, action.duration)
+        action.fn();
+        _runNextAction(action.duration ?? 0);        
+    }, duration);
+}
+function _runActions() {
+    isActionRunning = true;
+    console.log("Running actions:", actionQueue.map(a => a.name + ' (' + a.duration + 'ms)'))
+    _runNextAction(0);    
+}
+function runActions() {
+    // Debounce
+    clearTimeout(startActionTimeout); // Stop the previous timeout
+    startActionTimeout = setTimeout(_runActions, 10) // Start a new timeout
+}
+function addAction(name, fn, duration) {
+    if (isActionRunning) { console.log("Blocked action:", name); return; } // Don't add actions while an action is running
+    actionQueue.push({
+        name,
+        fn,
+        duration: duration ?? 0
+    })
+    runActions();
+}
 function unimplemented() {
     console.warn("Unimplemented", ...arguments)
 }
-
-globalThis.SHOWTEXT = function () {
-    unimplemented('SHOWTEXT', ...arguments)
+globalThis.SHOWTEXT = function (text) {
+    addAction('ShowText', () => {
+        console.log("ShowText:", ...arguments)
+        currentText = text;
+    }, 2000)
+    addAction('HideText', () => {
+        currentText = '';
+    })
 }
-globalThis.WAIT = function () {
-    unimplemented('WAIT', ...arguments)
+globalThis.WAIT = function (ms) {
+    addAction('Wait', () => {
+       // Nothing
+    }, ms)
 };
 globalThis.GOTO = function (room) {
-    let r = gameInfo.rooms.find(r => r.name == room)
-    setRoom(r)
+    addAction('GotoRoom', () => {
+        console.log("GotoRoom:", room)	
+        actionQueue.length = 0; // Remove everything queued up
+        let r = gameInfo.rooms.find(r => r.name == room)
+        setRoom(r)
+    })
 };
 globalThis.SHOWACTOR = function (name) {
-    let actor = getRoomActor(name);
-    if (actor) actor.visible = true;
+    addAction('ShowActor', () => {
+        console.log("ShowActor:", name)
+        let actor = getRoomActor(name);
+        if (actor) actor.visible = true;
+    })
 };
 globalThis.HIDEACTOR = function (name) {
-    let actor = getRoomActor(name);
-    if (actor) actor.visible = false;
+    addAction('HideActor', () => {
+        console.log("HideActor:", name)
+        let actor = getRoomActor(name);
+        if (actor) actor.visible = false;
+    })
 };
 globalThis.MOVEACTOR = function () {
     unimplemented('MOVEACTOR', ...arguments)
 };
-
 globalThis.PLAYSOUND = function (name, options) {
-    let sound = getSound(name);
-    options = {
-        volume: sound.defaultVolume ?? 1,
-        rate: 1,
-        delay: 0,
-        start: 0,
-        duration: undefined,
-        ...options
-    };
-    
-    sound.sound.setLoop(false)
-    sound.sound.stop()
-    sound.sound.play(options.delay, options.rate, options.volume, options.start, options.duration)
+    addAction('PlaySound', () => {
+        let sound = getSound(name);
+        options = {
+            volume: sound.defaultVolume ?? 1,
+            rate: 1,
+            delay: 0,
+            start: 0,
+            duration: undefined,
+            ...options
+        };
+
+        sound.sound.setLoop(false)
+        sound.sound.stop()
+        sound.sound.play(options.delay, options.rate, options.volume, options.start, options.duration)
+    });
 };
 
 globalThis.STOPSOUND = function (name) {
-    let sound = getSound(name);
-    sound.sound.stop()
+    addAction('StopSound', () => {
+        let sound = getSound(name);
+        sound.sound.stop()
+    })
 };
 globalThis.LOOPSOUND = function (name, options) {
-    let sound = getSound(name);
-    options = {
-        volume: sound.defaultVolume ?? 1,
-        rate: 1,
-        delay: 0,
-        start: 0,
-        duration: undefined,
-        ...options
-    };
-    console.log(options, sound)
-    sound.sound.pause()
-    sound.sound.stop()
-    sound.sound.loop(options.delay, options.rate, options.volume, options.start, options.duration)
+    addAction('LoopSound', () => {
+        let sound = getSound(name);
+        options = {
+            volume: sound.defaultVolume ?? 1,
+            rate: 1,
+            delay: 0,
+            start: 0,
+            duration: undefined,
+            ...options
+        };
+        console.log(options, sound)
+        sound.sound.pause()
+        sound.sound.stop()
+        sound.sound.loop(options.delay, options.rate, options.volume, options.start, options.duration)
+    });
 };
 
 /**
@@ -264,7 +329,7 @@ function getActionByNameOrWildcard(actions, name) {
 
 function getRoomActor(name) {
     let result = currentRoom.actors.find(a => a.name === name)
-    if(!result) console.warn(`Actor ${name} not found in room ${currentRoom.name}`)
+    if (!result) console.warn(`Actor ${name} not found in room ${currentRoom.name}`)
     return result;
 }
 
@@ -426,6 +491,10 @@ function initialize() {
             fn(context)
         })
 
+        // Draw current text
+        P5.push();
+        P5.text(currentText, 0, 0, gameInfo.width, gameInfo.height, "center", "bottom");
+        P5.pop();
 
         // Temp, draw current verb, etc.
         if (isDebug) {
@@ -433,8 +502,12 @@ function initialize() {
             P5.noStroke();
             P5.fill(255, 0, 0)
             P5.textSize(24)
-            P5.textAlign("left", "center")
+            P5.textAlign("left", "top")
             P5.text(currentVerb, 10, 2 + (gameInfo.fontSize / 2))
+
+            actionQueue.forEach((action, i) => {
+                P5.text(`${action.name} (${action.duration ?? 0}ms)`, 10, 30 + (gameInfo.fontSize / 2) + (i * gameInfo.fontSize))
+            })
             P5.pop();
         }
     }

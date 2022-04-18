@@ -31,7 +31,7 @@ IMAGE("Cheese", require('url:./data/TestAdv/KitchenRoom/Cheese.png'))
 // Sound effects and stuff
 SOUND("menu", require("url:./data/menu.wav"))
 SOUND("kitchen", require("url:./data/62215.wav"))
-SOUND("bg", require("url:./data/chill.mp3"), {volume: 0.5}) // Credit: https://www.looperman.com/loops/detail/289801/lenoxbeatmaker-sativaskunk-free-146bpm-jazz-electric-guitar-loop
+SOUND("bg", require("url:./data/chill.mp3"), { volume: 0.5 }) // Credit: https://www.looperman.com/loops/detail/289801/lenoxbeatmaker-sativaskunk-free-146bpm-jazz-electric-guitar-loop
 
 // Global vars (just normal js vars)
 var hasTestActorMoved = false
@@ -51,19 +51,19 @@ ANIMATION("iBatFlap", "iBatStrip", 200, [
 
 
 ROOM("LeftRoom", () => {
-/*
-    Room Puzzle:
-        TestActor is in the way of the closet door, A mouse needs to be lured out
-        of the mousehole to scare TestActor out of the room.
-*/
+    /*
+        Room Puzzle:
+            TestActor is in the way of the closet door, A mouse needs to be lured out
+            of the mousehole to scare TestActor out of the room.
+    */
 
     let hasEntered = false;
 
     BACKGROUND("LeftRoomBG")
 
     HOTSPOT("gotoCloset", 347, 114, 442, 307)
-    HOTSPOT("gotoRightRoom",610, 0, 640, 400)
-    HOTSPOT("mouseHole",175, 290, 195, 310)
+    HOTSPOT("gotoRightRoom", 550, 0, 640, 400)
+    HOTSPOT("mouseHole", 175, 290, 195, 310)
 
     ENTER(() => {
         if (!hasEntered) {
@@ -119,14 +119,14 @@ ROOM("LeftRoom", () => {
 
 
 ROOM("RightRoom", () => {
-/*
-    Room Puzzle:
-        Move painting, open safe with code from closet
-*/
+    /*
+        Room Puzzle:
+            Move painting, open safe with code from closet
+    */
 
     BACKGROUND("RightRoomBG")
 
-    HOTSPOT("gotoLeftRoom",0, 0, 30, 400)
+    HOTSPOT("gotoLeftRoom", 0, 0, 80, 400)
     HOTSPOT("gotoKitchenRoom", 582, 139, 623, 382)
 
     ACTOR("WallSafe", {
@@ -164,7 +164,7 @@ ROOM("RightRoom", () => {
 ROOM("KitchenRoom", () => {
     BACKGROUND("KitchenBG")
 
-    HOTSPOT("gotoRightRoom", 14 , 135, 54, 387)
+    HOTSPOT("gotoRightRoom", 14, 135, 54, 387)
 
     ACTOR("FridgeDoorClosed", {
         x: 101,
@@ -209,6 +209,7 @@ ROOM("KitchenRoom", () => {
 
     ENTER(() => {
         //PLAYSOUND("kitchen")
+        SHOWACTOR("FridgeDoorClosed")
         HIDEACTOR("FridgeDoorOpen")
         HIDEACTOR("Cheese")
     })
@@ -245,7 +246,7 @@ ROOM("KitchenRoom", () => {
 //     let { p5, canvas, gameInfo } = ctx;
 
 //     if (p5.mouseX >= 0 && p5.mouseX <= canvas.width && p5.mouseY >= 0 && p5.mouseY <= canvas.height) {
-//         if (isMouseDown) { 
+//         if (isMouseDown) {
 //             if (gameInfo.images[0]) {
 //                 p5.image(gameInfo.images[0].image, p5.mouseX - radius, p5.mouseY - radius, radius * 2, radius * 2);
 //             }
