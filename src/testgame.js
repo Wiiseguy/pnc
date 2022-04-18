@@ -72,13 +72,10 @@ ROOM("LeftRoom", () => {
         visible: false
     })
 
-    ENTER(() => {
-        if (!hasEntered) {
-            hasEntered = true;
-            LOOPSOUND("bg", {
-                rate: 0.9 + Math.random() / 5
-            })
-        }
+    ONCE(() => {
+        LOOPSOUND("bg", {
+            rate: 0.9 + Math.random() / 5
+        })
     })
 
     ACTOR("TestActor", {
@@ -153,8 +150,6 @@ ROOM("RightRoom", () => {
     CLICK("Painting", () => {
         HIDEACTOR("Painting")
     })
-
-
 
     CLICK("gotoLeftRoom", () => {
         GOTO("LeftRoom")

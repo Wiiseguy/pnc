@@ -121,7 +121,9 @@ globalThis.ROOM = function (name, def) {
         verbs: [],
         hotspots: [],
         actors: [],
-        onEnter: function () { }
+        onEnter: function () { },
+        onEnterOnce: function () { },
+        _doneEnterOnce: false
     });
 }
 
@@ -161,6 +163,9 @@ globalThis.CLICK = function (subject, action) {
 }
 globalThis.ENTER = function (action) {
     currentRoomDef.onEnter = action;
+}
+globalThis.ONCE = function(action) {
+    currentRoomDef.onEnterOnce = action;
 }
 // ACTOR() is defined earlier in this file
 
@@ -214,6 +219,11 @@ globalThis.SHOWTEXT = function (text) {
         currentText = '';
     })
 }
+globalThis.HIDETEXT = function (text) {
+    addAction('HideText', () => {
+        currentText = '';
+    })
+}
 globalThis.WAIT = function (ms) {
     addAction('Wait', () => {
         // Nothing
@@ -236,6 +246,12 @@ globalThis.HIDEACTOR = function (name) {
     addAction('HideActor', () => {
         let actor = getRoomActor(name);
         if (actor) actor.visible = false;
+    })
+};
+globalThis.TOGGLEACTOR = function (name) {
+    addAction('ToggleActor', () => {
+        let actor = getRoomActor(name);
+        if (actor) actor.visible = !actor.visible;
     })
 };
 globalThis.MOVEACTOR = function (name, x, y, duration, wait = false) {
@@ -317,6 +333,10 @@ function setRoom(room) {
         return;
     }
     currentRoom = room;
+    if (!currentRoom._doneEnterOnce) {
+        currentRoom._doneEnterOnce = true;
+        currentRoom.onEnterOnce();
+    }
     currentRoom.onEnter();
 }
 
