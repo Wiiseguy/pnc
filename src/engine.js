@@ -167,6 +167,10 @@ globalThis.CLICK = function (subject, action) {
     globalThis.VERB('*', subject, action)
 }
 globalThis.ENTER = function (action) {
+    if (typeof action !== 'function') {
+        console.warn('[ENTER] action must be a function, got:', action);
+        return;
+    }
     currentRoomDef.onEnter = action;
 }
 globalThis.ONCE = function(action) {
@@ -177,21 +181,19 @@ globalThis.ONCE = function(action) {
 
 // ACTIONS
 let startActionTimeout = null;
-function _runNextAction(duration) {
+function _runNextAction() {
     if (actionQueue.length === 0) {
         isActionRunning = false;
         console.log("Ran all actions.")
         return;
     }
-    setTimeout(() => {
-        let action = actionQueue.shift();
-        if (!action.duration && actionQueue.length === 0) {
-            isActionRunning = false;
-        }
-        console.log("Running action:", action.name, action.duration)
-        action.fn();
-        _runNextAction(action.duration ?? 0);
-    }, duration);
+
+    let action = actionQueue.shift();
+    console.log("Running action:", action.name, action.duration)
+    action.fn();    
+    let duration = action.duration ?? 0;    
+
+    setTimeout(_runNextAction, duration);
 }
 function _runActions() {
     isActionRunning = true;
@@ -204,7 +206,7 @@ function runActions() {
     startActionTimeout = setTimeout(_runActions, 10) // Start a new timeout
 }
 function addAction(name, fn, duration) {
-    if (isActionRunning) { console.log("Blocked action:", name); return; } // Don't add actions while an action is running
+    //if (isActionRunning) { console.log("Blocked action:", name); return; } // Don't add actions while an action is running
     actionQueue.push({
         name,
         fn,
@@ -216,10 +218,11 @@ function unimplemented() {
     console.warn("Unimplemented", ...arguments)
 }
 globalThis.SHOWTEXT = function (text) {
+    let duration = 1000 + text.length * 10;
     addAction('ShowText', () => {
         console.log("ShowText:", ...arguments)
         currentText = text;
-    }, 2000)
+    }, duration)
     addAction('HideText', () => {
         currentText = '';
     })
@@ -418,6 +421,10 @@ function initialize() {
     const canvas = P5.createCanvas(gameInfo.width, gameInfo.height);
 
     canvas.mousePressed(function (e) {
+        if (isActionRunning) {
+            console.log("Blocked click, because isActionRunning == true");
+            return;
+        }
         if (P5.mouseButton != 'left') return;
 
         isMouseDown = true;

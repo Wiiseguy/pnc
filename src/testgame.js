@@ -100,6 +100,8 @@ ROOM("HallWay_Left", () => {
             WAIT(1000)
             SHOWACTOR("Mouse")
             WAIT(500)
+            
+            SHOWTEXT("🐭")
             PLAYSOUND("TestActorScream")
             SHOWTEXT("AHH! A MOUSE!!")
             MOVEACTOR("TestActor", 700, 160, 1000, true, { easing: 'easeInElastic(1, .6)' })
@@ -148,17 +150,20 @@ ROOM("HallWay_Right", () => {
     })
 
     VERB('use', "WallSafe", () => {
-        SHOWTEXT("Its not safe any more.. ehehehe")
+        SHOWTEXT("It's not safe any more.. ehehehe.")
     })
 
     CLICK("Painting", painting => {
+        
         if (!painting.fallen) {
             painting.fallen = true
+            MOVEACTOR("Painting", painting.x + 10, painting.y, 100, true)
+            MOVEACTOR("Painting", painting.initialX, painting.initialY, 100, true)
             MOVEACTOR("Painting", 266, 185, 800, true, { easing: 'easeInQuart' })
             SHOWTEXT("Whoops!")
         } else {
             painting.fallen = false
-            MOVEACTOR("Painting", painting.initialX, painting.initialY, 800, true, { easing: 'easeInQuart' })
+            MOVEACTOR("Painting", painting.initialX, painting.initialY, 800, true)
         }
     })
 
@@ -222,6 +227,10 @@ ROOM("KitchenRoom", () => {
     VERB('use', "Cheese", () => {
         HIDEACTOR("Cheese")
         hasCheese = true
+    })
+
+    ENTER(() => {
+        //PLAYSOUND("kitchen")
     })
 })
 
