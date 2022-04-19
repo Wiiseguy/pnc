@@ -423,13 +423,17 @@ function initialize() {
         isMouseDown = true;
 
         let action = null;
+        let target = null;
 
         for (let i = currentRoom.actors.length - 1; i >= 0; i--) {
             let a = currentRoom.actors[i];
             if (!a.visible) continue; // Skip to next if actor is not visible
             if (P5.mouseX >= a.x && P5.mouseX <= a.x + a.image.image.width && P5.mouseY >= a.y && P5.mouseY <= a.y + a.image.image.height) {
                 action = getActionByNameOrWildcard(a.actions, currentVerb);
-                if (action) break; // Quit looking and break from for loop
+                if (action) {
+                    target = a;
+                    break; // Quit looking and break from for loop
+                }
             }
         }
 
@@ -439,14 +443,17 @@ function initialize() {
                 let h = currentRoom.hotspots[i];            
                 if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
                     action = getActionByNameOrWildcard(h.actions, currentVerb);
-                    if (action) break; // Quit looking and break from for loop
+                    if (action) {
+                        target = h;
+                        break; // Quit looking and break from for loop
+                    }
                 }
             }
         }
 
         if (action) {
             console.group("Action", action)
-            action.action();
+            action.action(target);
             console.groupEnd('Action')
         }
     });

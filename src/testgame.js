@@ -151,9 +151,15 @@ ROOM("HallWay_Right", () => {
         SHOWTEXT("Its not safe any more.. ehehehe")
     })
 
-    CLICK("Painting", () => {
-        MOVEACTOR("Painting", 266, 185, 1000, true, {easing: 'easeInQuart'})
-        SHOWTEXT("Whoops!")
+    CLICK("Painting", painting => {
+        if (!painting.fallen) {
+            painting.fallen = true
+            MOVEACTOR("Painting", 266, 185, 800, true, { easing: 'easeInQuart' })
+            SHOWTEXT("Whoops!")
+        } else {
+            painting.fallen = false
+            MOVEACTOR("Painting", painting.initialX, painting.initialY, 800, true, { easing: 'easeInQuart' })
+        }
     })
 
     CLICK("gotoHallway_Left", () => {
