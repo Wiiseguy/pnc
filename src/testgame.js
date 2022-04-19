@@ -15,6 +15,7 @@ STARTROOM("HallWay_Left")
 IMAGE("HallWay_LeftBG", require('url:./data/TestAdv/HallWay_Left/HallWay_LeftBG.png'))
 IMAGE("TestActor", require('url:./data/TestAdv/HallWay_Left/TestActor.png'))
 IMAGE("Shelf", require('url:./data/TestAdv/HallWay_Left/Shelf.png'))
+IMAGE("Fidget", require('url:./data/TestAdv/HallWay_Left/Fidget.png'))
 
 // Room - Right Room
 IMAGE("HallWay_RightBG", require('url:./data/TestAdv/HallWay_Right/HallWay_RightBG.png'))
@@ -66,9 +67,14 @@ ROOM("HallWay_Left", () => {
     ACTOR("TestActor", {
         x: 370,
         y: 160,
-        image: "TestActor",
-        rotation: 180,
-        rotateSpeed: 0.1
+        image: "TestActor"
+    })
+
+    ACTOR("Fidget", {
+        x: 370,
+        y: 20,
+        image: "Fidget",
+        rotation: 0,
     })
 
     ACTOR("Shelf", {
@@ -84,13 +90,14 @@ ROOM("HallWay_Left", () => {
         visible: false
     })
 
+    CLICK("Fidget", fidget => {
+        fidget.rotateSpeed += 10;
+        fidget.rotateFriction = 0.2;
+    })
+
     CLICK("TestActor", () => {
         //PLAYSOUND("kitchen", { rate: 0.5 + Math.random() })
-        GETACTOR("TestActor", actor => {
-            actor.rotateSpeed += 10;
-            actor.rotateFriction = 0.2;
-        })
-        //SHOWTEXT("They don't seem interested in talking to me.")        
+        SHOWTEXT("They don't seem interested in talking to me.")
     })
 
     CLICK("mouseHole", () => {
@@ -100,7 +107,7 @@ ROOM("HallWay_Left", () => {
             WAIT(1000)
             SHOWACTOR("Mouse")
             WAIT(500)
-            
+
             SHOWTEXT("🐭")
             PLAYSOUND("TestActorScream")
             SHOWTEXT("AHH! A MOUSE!!")
@@ -154,7 +161,7 @@ ROOM("HallWay_Right", () => {
     })
 
     CLICK("Painting", painting => {
-        
+
         if (!painting.fallen) {
             painting.fallen = true
             MOVEACTOR("Painting", painting.x + 10, painting.y, 100, true)
