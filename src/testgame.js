@@ -152,7 +152,7 @@ ROOM("HallWay_Right", () => {
     })
 
     CLICK("Painting", () => {
-        MOVEACTOR("Painting", 266, 185, 10, true, {easing: 'easeInQuart'})
+        MOVEACTOR("Painting", 266, 185, 1000, true, {easing: 'easeInQuart'})
         SHOWTEXT("Whoops!")
     })
 

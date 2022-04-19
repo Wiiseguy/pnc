@@ -272,9 +272,10 @@ globalThis.MOVEACTOR = function (name, x, y, duration, wait = false, options) {
                 x: x,
                 y: y,
                 easing: options.easing,
+                duration: duration,
             });
         }
-    }, wait ? 0 : duration)
+    }, wait ? duration : 0)
 };
 globalThis.GETACTOR = function (name, fn) {
     addAction('GetActor', () => {
