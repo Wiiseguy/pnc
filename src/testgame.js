@@ -38,6 +38,7 @@ SOUND("bg", require("url:./data/chill.mp3"), { volume: 0.3 }) // Credit: https:/
 
 // Global vars
 let hasCheese = false
+let fridgeOpen = false
 
 // Animations
 ANIMATION("iBatFlap", "iBatStrip", 200, [
@@ -181,6 +182,12 @@ ROOM("HallWay_Right", () => {
     CLICK("gotoKitchenRoom", () => {
         GOTO("KitchenRoom")
     })
+
+    ENTER(_ => {
+        if (fridgeOpen) {
+            SHOWTEXT("You left the fridge wide open, you doofus!")
+        }
+    })
 })
 
 
@@ -223,12 +230,14 @@ ROOM("KitchenRoom", () => {
         if (!hasCheese) {
             SHOWACTOR("Cheese")
         }
+        fridgeOpen = true
     })
 
     CLICK("FridgeDoorOpen", () => {
         HIDEACTOR("FridgeDoorOpen")
         SHOWACTOR("FridgeDoorClosed")
         HIDEACTOR("Cheese")
+        fridgeOpen = false
     })
 
     VERB('use', "Cheese", () => {

@@ -173,7 +173,7 @@ globalThis.ENTER = function (action) {
     }
     currentRoomDef.onEnter = action;
 }
-globalThis.ONCE = function(action) {
+globalThis.ONCE = function (action) {
     currentRoomDef.onEnterOnce = action;
 }
 // ACTOR() is defined earlier in this file
@@ -190,8 +190,8 @@ function _runNextAction() {
 
     let action = actionQueue.shift();
     console.log("Running action:", action.name, action.duration)
-    action.fn();    
-    let duration = action.duration ?? 0;    
+    action.fn();
+    let duration = action.duration ?? 0;
 
     setTimeout(_runNextAction, duration);
 }
@@ -203,16 +203,17 @@ function _runActions() {
 function runActions() {
     // Debounce
     clearTimeout(startActionTimeout); // Stop the previous timeout
-    startActionTimeout = setTimeout(_runActions, 10) // Start a new timeout
+    startActionTimeout = setTimeout(_runActions, 1) // Start a new timeout
 }
 function addAction(name, fn, duration) {
-    //if (isActionRunning) { console.log("Blocked action:", name); return; } // Don't add actions while an action is running
     actionQueue.push({
         name,
         fn,
         duration: duration ?? 0
     })
-    runActions();
+    if (!isActionRunning) {
+        runActions();
+    }
 }
 function unimplemented() {
     console.warn("Unimplemented", ...arguments)
@@ -373,7 +374,7 @@ function getSound(name) {
     return sound;
 }
 
-function getActionByNameOrWildcard(actions, name) {    
+function getActionByNameOrWildcard(actions, name) {
     return actions?.find(a => a.name === name || a.name === '*')
 }
 
@@ -447,7 +448,7 @@ function initialize() {
         // If no actor actions were found, try hotspots
         if (!action) {
             for (let i = currentRoom.hotspots.length - 1; i >= 0; i--) {
-                let h = currentRoom.hotspots[i];            
+                let h = currentRoom.hotspots[i];
                 if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
                     action = getActionByNameOrWildcard(h.actions, currentVerb);
                     if (action) {
