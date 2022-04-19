@@ -5,20 +5,23 @@ AUTHOR("Chronic")
 AUTHOR("Wiiseguy")
 SIZE(640, 400)
 FONTSIZE(32)
-DEBUG()
+//DEBUG()
 //NOINTRO()
 BGCOLOR('#ff00ff')
 
-STARTROOM("HallWay_Left")
+STARTROOM("Bedroom")
+
+// Room - Bedroom
+IMAGE("BedroomBG", require('url:./data/TestAdv/Bedroom/Bedroom.png'))
 
 // Room - Left Room
-IMAGE("HallWay_LeftBG", require('url:./data/TestAdv/HallWay_Left/HallWay_LeftBG.png'))
-IMAGE("TestActor", require('url:./data/TestAdv/HallWay_Left/TestActor.png'))
-IMAGE("Shelf", require('url:./data/TestAdv/HallWay_Left/Shelf.png'))
-IMAGE("Fidget", require('url:./data/TestAdv/HallWay_Left/Fidget.png'))
+IMAGE("Hallway_LeftBG", require('url:./data/TestAdv/Hallway_Left/Hallway_LeftBG.png'))
+IMAGE("TestActor", require('url:./data/TestAdv/Hallway_Left/TestActor.png'))
+IMAGE("Shelf", require('url:./data/TestAdv/Hallway_Left/Shelf.png'))
+IMAGE("Fidget", require('url:./data/TestAdv/Hallway_Left/Fidget.png'))
 
 // Room - Right Room
-IMAGE("HallWay_RightBG", require('url:./data/TestAdv/HallWay_Right/HallWay_RightBG.png'))
+IMAGE("Hallway_RightBG", require('url:./data/TestAdv/HallWay_Right/HallWay_RightBG.png'))
 IMAGE("Painting", require('url:./data/TestAdv/HallWay_Right/Painting.png'))
 IMAGE("WallSafe", require('url:./data/TestAdv/HallWay_Right/WallSafe.png'))
 
@@ -30,7 +33,7 @@ IMAGE("Cheese", require('url:./data/TestAdv/KitchenRoom/Cheese.png'))
 
 
 // Sound effects and stuff
-SOUND("TestActorScream", require("url:./data/TestAdv/HallWay_Left/scream.wav"))
+SOUND("TestActorScream", require("url:./data/TestAdv/Hallway_Left/scream.wav"))
 
 SOUND("menu", require("url:./data/menu.wav"))
 SOUND("kitchen", require("url:./data/62215.wav"))
@@ -47,18 +50,47 @@ ANIMATION("iBatFlap", "iBatStrip", 200, [
 ])
 
 
+ROOM("Bedroom", () => {
+    /*
+        Bedroom Puzzle
+            None
+    */
+    BACKGROUND("BedroomBG")
+    HOTSPOT("gotoHallway_Right", 294, 114, 390, 307)
+
+    ONCE(() => {
+        WAIT(1000)
+        SHOWTEXT("DRIP.")
+        WAIT(500)
+        SHOWTEXT("DRIP..")
+        WAIT(500)
+        SHOWTEXT("DRIP...")
+        WAIT(500)
+        SHOWTEXT("Can someone fix that faucet dripping please?!!")
+        WAIT(1000)
+        SHOWTEXT("i'M! TRYING! TO! SLEEP!")
+        WAIT(1000)
+        SHOWTEXT("DRIP....")
+        SHOWTEXT("FINE! I'LL FIX IT MYSELF! UGH!")
+    })
+
+    CLICK("gotoHallway_Right", () => {
+        GOTO("Hallway_Right")
+    })
+})
+
 /*
-    HallWay_Left Puzzle
+    Hallway_Left Puzzle
         TestActor is in the way of the closet door, A mouse needs to be lured out
         of the mousehole with cheese to scare TestActor out of the room.
 */
-ROOM("HallWay_Left", () => {
+ROOM("Hallway_Left", () => {
     let hasTestActorMoved = false
 
-    BACKGROUND("HallWay_LeftBG")
+    BACKGROUND("Hallway_LeftBG")
 
     HOTSPOT("gotoCloset", 347, 114, 442, 307)
-    HOTSPOT("gotoHallWay_Right", 550, 0, 640, 400)
+    HOTSPOT("gotoHallway_Right", 550, 0, 640, 400)
     HOTSPOT("mouseHole", 175, 290, 195, 310)
 
     ONCE(() => {
@@ -129,8 +161,8 @@ ROOM("HallWay_Left", () => {
         }
     })
 
-    CLICK("gotoHallWay_Right", () => {
-        GOTO("HallWay_Right")
+    CLICK("gotoHallway_Right", () => {
+        GOTO("Hallway_Right")
     })
 })
 
@@ -139,11 +171,12 @@ ROOM("HallWay_Left", () => {
     HallWay_Right Puzzle
         Move painting, open safe with code from closet
 */
-ROOM("HallWay_Right", () => {
-    BACKGROUND("HallWay_RightBG")
+ROOM("Hallway_Right", () => {
+    BACKGROUND("Hallway_RightBG")
 
     HOTSPOT("gotoHallway_Left", 0, 0, 80, 400)
     HOTSPOT("gotoKitchenRoom", 582, 139, 623, 382)
+    HOTSPOT("gotoBedroom", 391, 114, 487, 307)
 
     ACTOR("WallSafe", {
         x: 201,
@@ -176,11 +209,15 @@ ROOM("HallWay_Right", () => {
     })
 
     CLICK("gotoHallway_Left", () => {
-        GOTO("HallWay_Left")
+        GOTO("Hallway_Left")
     })
 
     CLICK("gotoKitchenRoom", () => {
         GOTO("KitchenRoom")
+    })
+
+    CLICK("gotoBedroom", () => {
+        GOTO("Bedroom")
     })
 
     ENTER(_ => {
@@ -198,7 +235,7 @@ ROOM("KitchenRoom", () => {
     */
     BACKGROUND("KitchenBG")
 
-    HOTSPOT("gotoHallWay_Right", 14, 135, 54, 387)
+    HOTSPOT("gotoHallway_Right", 14, 135, 54, 387)
 
     ACTOR("FridgeDoorClosed", {
         x: 101,
@@ -220,8 +257,8 @@ ROOM("KitchenRoom", () => {
         visible: false
     })
 
-    CLICK("gotoHallWay_Right", () => {
-        GOTO("HallWay_Right")
+    CLICK("gotoHallway_Right", () => {
+        GOTO("Hallway_Right")
     })
 
     CLICK("FridgeDoorClosed", () => {
