@@ -27,8 +27,19 @@ export class CustomContext {
     }
 }
 
-interface IInteractive {
-    actions: GameAction[];
+export class GameObject {
+    x: number = 0;
+    y: number = 0;
+    xSpeed: number = 0;
+    ySpeed: number = 0;
+    friction: number = 0;
+
+    fade: number = 1;
+    scale: number = 1;
+
+    rotation: number = 0;
+    rotateSpeed: number = 0;
+    rotateFriction: number = 0;
 }
 
 export class GameSound {
@@ -43,17 +54,16 @@ export class GameSound {
     }
 }
 
-export class GameActor implements IInteractive {
+export class GameActor extends GameObject {
     name: string;
     actions: GameAction[];
     initialX: number;
     initialY: number;
-    x: number;
-    y: number;
     imageName: string;
     image: P5.Image;
     visible: boolean;
     constructor(name: string, x: number, y: number, imageName: string, visible: boolean) {
+        super();
         this.name = name;
         this.initialX = x;
         this.initialY = y;
@@ -74,7 +84,7 @@ export class GameAction {
     }
 }
 
-export class GameHotspot implements IInteractive {
+export class GameHotspot {
     name: string;
     x1: number;
     y1: number;

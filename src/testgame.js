@@ -33,7 +33,7 @@ SOUND("TestActorScream", require("url:./data/TestAdv/HallWay_Left/scream.wav"))
 
 SOUND("menu", require("url:./data/menu.wav"))
 SOUND("kitchen", require("url:./data/62215.wav"))
-SOUND("bg", require("url:./data/chill.mp3"), { volume: 0.2 }) // Credit: https://www.looperman.com/loops/detail/289801/lenoxbeatmaker-sativaskunk-free-146bpm-jazz-electric-guitar-loop
+SOUND("bg", require("url:./data/chill.mp3"), { volume: 0.3 }) // Credit: https://www.looperman.com/loops/detail/289801/lenoxbeatmaker-sativaskunk-free-146bpm-jazz-electric-guitar-loop
 
 // Global vars
 let hasCheese = false
@@ -60,13 +60,15 @@ ROOM("HallWay_Left", () => {
     HOTSPOT("mouseHole", 175, 290, 195, 310)
 
     ONCE(() => {
-        LOOPSOUND("bg", { rate: 0.9 + Math.random() / 5 })
+        //LOOPSOUND("bg", { rate: 0.9 + Math.random() / 5 })
     })
 
     ACTOR("TestActor", {
         x: 370,
         y: 160,
-        image: "TestActor"
+        image: "TestActor",
+        rotation: 180,
+        rotateSpeed: 0.1
     })
 
     ACTOR("Shelf", {
@@ -84,7 +86,11 @@ ROOM("HallWay_Left", () => {
 
     CLICK("TestActor", () => {
         //PLAYSOUND("kitchen", { rate: 0.5 + Math.random() })
-        SHOWTEXT("They don't seem interested in talking to me.")
+        GETACTOR("TestActor", actor => {
+            actor.rotateSpeed += 10;
+            actor.rotateFriction = 0.2;
+        })
+        //SHOWTEXT("They don't seem interested in talking to me.")        
     })
 
     CLICK("mouseHole", () => {

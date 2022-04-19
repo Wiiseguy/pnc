@@ -8,6 +8,8 @@ const { GameInfo, CustomContext, GameHotspot, GameRoom, GameAction, GameActor, G
 const P5 = new p5(() => 1337);
 globalThis.P5 = P5;
 
+const D_PI = Math.PI / 180;
+
 
 const gameInfo = new GameInfo();
 let verbs = ['use']
@@ -65,6 +67,9 @@ globalThis.STARTROOM = function (room) {
 
 globalThis.ACTOR = function (name, def) {
     let actor = new GameActor(name, def.x, def.y, def.image, def.visible);
+    actor.rotation = def.rotation ?? 0;
+    actor.scale = def.scale ?? 1;
+    actor.rotateSpeed = def.rotateSpeed ?? 0;
 
     // If we're current handling room defs, add the actor to the current room
     if (currentRoomDef) {
@@ -271,6 +276,14 @@ globalThis.MOVEACTOR = function (name, x, y, duration, wait = false, options) {
         }
     }, wait ? 0 : duration)
 };
+globalThis.GETACTOR = function (name, fn) {
+    addAction('GetActor', () => {
+        let actor = getRoomActor(name);
+        if (actor && fn) {
+            fn(actor)
+        }
+    })
+};
 globalThis.PLAYSOUND = function (name, options) {
     addAction('PlaySound', () => {
         let sound = getSound(name);
@@ -370,9 +383,32 @@ function initializeActor(actor) {
     actor.image = getImage(actor.imageName);
 }
 
+function applyFriction(obj, friction, propName) {
+    if (obj[propName] > 0) {
+        obj[propName] -= friction;
+        if (obj[propName] < 0) obj[propName] = 0;
+    } else if (obj[propName] < 0) {
+        obj[propName] += friction;
+        if (obj[propName] > 0) obj[propName] = 0;
+    }
+}
+
+
 function drawActor(actor) {
     if (!actor.visible) return;
-    P5.image(actor.image.image, actor.x, actor.y)
+    // Update props
+    actor.rotation += actor.rotateSpeed;
+    applyFriction(actor, actor.rotateFriction, 'rotateSpeed')
+
+    // Draw
+    let centerX = actor.image.image.width / 2;
+    let centerY = actor.image.image.height / 2;
+    P5.push();
+    P5.translate(actor.x + centerX, actor.y + centerY)
+    P5.rotate(actor.rotation * D_PI)
+    P5.translate(-centerX, -centerY)
+    P5.image(actor.image.image, 0, 0)
+    P5.pop();
 }
 
 function initialize() {
