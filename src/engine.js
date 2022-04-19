@@ -356,7 +356,7 @@ function getSound(name) {
     return sound;
 }
 
-function getActionByNameOrWildcard(actions, name) {
+function getActionByNameOrWildcard(actions, name) {    
     return actions?.find(a => a.name === name || a.name === '*')
 }
 
@@ -387,7 +387,8 @@ function initialize() {
 
         let action = null;
 
-        for (let a of currentRoom.actors) {
+        for (let i = currentRoom.actors.length - 1; i >= 0; i--) {
+            let a = currentRoom.actors[i];
             if (!a.visible) continue; // Skip to next if actor is not visible
             if (P5.mouseX >= a.x && P5.mouseX <= a.x + a.image.image.width && P5.mouseY >= a.y && P5.mouseY <= a.y + a.image.image.height) {
                 action = getActionByNameOrWildcard(a.actions, currentVerb);
@@ -397,7 +398,8 @@ function initialize() {
 
         // If no actor actions were found, try hotspots
         if (!action) {
-            for (let h of currentRoom.hotspots) {
+            for (let i = currentRoom.hotspots.length - 1; i >= 0; i--) {
+                let h = currentRoom.hotspots[i];            
                 if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
                     action = getActionByNameOrWildcard(h.actions, currentVerb);
                     if (action) break; // Quit looking and break from for loop

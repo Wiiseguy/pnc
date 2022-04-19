@@ -5,7 +5,7 @@ AUTHOR("Chronic")
 AUTHOR("Wiiseguy")
 SIZE(640, 400)
 FONTSIZE(32)
-//DEBUG()
+DEBUG()
 //NOINTRO()
 BGCOLOR('#ff00ff')
 
@@ -35,21 +35,14 @@ SOUND("menu", require("url:./data/menu.wav"))
 SOUND("kitchen", require("url:./data/62215.wav"))
 SOUND("bg", require("url:./data/chill.mp3"), { volume: 0.5 }) // Credit: https://www.looperman.com/loops/detail/289801/lenoxbeatmaker-sativaskunk-free-146bpm-jazz-electric-guitar-loop
 
-// Global vars (just normal js vars)
-var hasTestActorMoved = false
-var hasCheese = false
+// Global vars
+let hasCheese = false
 
 // Animations
 ANIMATION("iBatFlap", "iBatStrip", 200, [
     [0, 0, 24, 19],
     [25, 0, 49, 19],
 ])
-
-// ACTOR("someGlobalActor", {
-//     x: 490,
-//     y: 320,
-//     image: 'TestActor'
-// })
 
 
 /*
@@ -58,17 +51,19 @@ ANIMATION("iBatFlap", "iBatStrip", 200, [
         of the mousehole with cheese to scare TestActor out of the room.
 */
 ROOM("HallWay_Left", () => {
+    let hasTestActorMoved = false
+
     BACKGROUND("HallWay_LeftBG")
 
     HOTSPOT("gotoCloset", 347, 114, 442, 307)
     HOTSPOT("gotoHallWay_Right", 550, 0, 640, 400)
     HOTSPOT("mouseHole", 175, 290, 195, 310)
 
-    // ONCE(() => {
-    //     LOOPSOUND("bg", {
-    //         rate: 0.9 + Math.random() / 5
-    //     })
-    // })
+    ONCE(() => {
+        LOOPSOUND("bg", {
+            rate: 0.9 + Math.random() / 5
+        })
+    })
 
     ACTOR("TestActor", {
         x: 370,
@@ -103,7 +98,7 @@ ROOM("HallWay_Left", () => {
             WAIT(500)
             PLAYSOUND("TestActorScream")
             SHOWTEXT("AHH! A MOUSE!!")
-            MOVEACTOR("TestActor", 700, 160, 2000, true)
+            MOVEACTOR("TestActor", 700, 160, 1000, true, { easing: 'easeInElastic(1, .6)' })
             hasTestActorMoved = true
         }
         else {
@@ -153,7 +148,7 @@ ROOM("HallWay_Right", () => {
     })
 
     CLICK("Painting", () => {
-        MOVEACTOR("Painting", 266, 185, 10, true)
+        MOVEACTOR("Painting", 266, 185, 10, true, {easing: 'easeInQuart'})
         SHOWTEXT("Whoops!")
     })
 
