@@ -33,7 +33,7 @@ SOUND("TestActorScream", require("url:./data/TestAdv/HallWay_Left/scream.wav"))
 
 SOUND("menu", require("url:./data/menu.wav"))
 SOUND("kitchen", require("url:./data/62215.wav"))
-SOUND("bg", require("url:./data/chill.mp3"), { volume: 0.5 }) // Credit: https://www.looperman.com/loops/detail/289801/lenoxbeatmaker-sativaskunk-free-146bpm-jazz-electric-guitar-loop
+SOUND("bg", require("url:./data/chill.mp3"), { volume: 0.2 }) // Credit: https://www.looperman.com/loops/detail/289801/lenoxbeatmaker-sativaskunk-free-146bpm-jazz-electric-guitar-loop
 
 // Global vars
 let hasCheese = false
@@ -60,9 +60,7 @@ ROOM("HallWay_Left", () => {
     HOTSPOT("mouseHole", 175, 290, 195, 310)
 
     ONCE(() => {
-        LOOPSOUND("bg", {
-            rate: 0.9 + Math.random() / 5
-        })
+        LOOPSOUND("bg", { rate: 0.9 + Math.random() / 5 })
     })
 
     ACTOR("TestActor", {
