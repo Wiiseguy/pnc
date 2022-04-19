@@ -146,13 +146,13 @@ ROOM("HallWay_Right", () => {
     HOTSPOT("gotoKitchenRoom", 582, 139, 623, 382)
 
     ACTOR("WallSafe", {
-        x: 285,
+        x: 201,
         y: 127,
         image: "WallSafe"
     })
 
     ACTOR("Painting", {
-        x: 266,
+        x: 189,
         y: 95,
         image: "Painting"
     })
@@ -167,7 +167,7 @@ ROOM("HallWay_Right", () => {
             painting.fallen = true
             MOVEACTOR("Painting", painting.x + 10, painting.y, 100, true)
             MOVEACTOR("Painting", painting.initialX, painting.initialY, 100, true)
-            MOVEACTOR("Painting", 266, 185, 800, true, { easing: 'easeInQuart' })
+            MOVEACTOR("Painting", 189, 185, 800, true, { easing: 'easeInQuart' })
             SHOWTEXT("Whoops!")
         } else {
             painting.fallen = false
