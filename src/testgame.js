@@ -9,7 +9,7 @@ FONTSIZE(32)
 //NOINTRO()
 BGCOLOR('#ff00ff')
 
-STARTROOM("Bedroom")
+STARTROOM("Hallway_Left")
 
 // Room - Bedroom
 IMAGE("BedroomBG", require('url:./data/TestAdv/Bedroom/Bedroom.png'))
@@ -31,6 +31,7 @@ IMAGE("FridgeDoorClosed", require('url:./data/TestAdv/KitchenRoom/FridgeDoorClos
 IMAGE("FridgeDoorOpen", require('url:./data/TestAdv/KitchenRoom/FridgeDoorOpen.png'))
 IMAGE("Cheese", require('url:./data/TestAdv/KitchenRoom/Cheese.png'))
 
+IMAGE("BatStrip", require('url:./data/bat_strip.png'))
 
 // Sound effects and stuff
 SOUND("TestActorScream", require("url:./data/TestAdv/Hallway_Left/scream.wav"))
@@ -43,11 +44,12 @@ SOUND("bg", require("url:./data/chill.mp3"), { volume: 0.3 }) // Credit: https:/
 let hasCheese = false
 let fridgeOpen = false
 
+
+// Sprites
+SPRITE("TestSprite", "TestActor", 10, 0, 29, 26.5)
+
 // Animations
-ANIMATION("iBatFlap", "iBatStrip", 200, [
-    [0, 0, 24, 19],
-    [25, 0, 49, 19],
-])
+ANIMATION("AnimatedBats", "BatStrip", 200, [2, 1]) // 2 columns, 1 row (2 frames)
 
 
 ROOM("Bedroom", () => {
@@ -106,7 +108,14 @@ ROOM("Hallway_Left", () => {
     ACTOR("Fidget", {
         x: 370,
         y: 20,
-        image: "Fidget",
+        image: "TestSprite",
+        rotation: 0,
+    })
+
+    ACTOR("bats", {
+        x: 470,
+        y: 40,
+        image: "AnimatedBats",
         rotation: 0,
     })
 

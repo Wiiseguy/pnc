@@ -74,30 +74,36 @@ globalThis.ACTOR = function (name, def) {
     // If we're current handling room defs, add the actor to the current room
     if (currentRoomDef) {
         currentRoomDef.actors.push(actor);
-        console.log("[ACTOR]: ", name, def, actor)
-
     }
     // Otherwise, add the actor to the global list
     else {
         gameInfo.actors.push(actor);
-        console.log("[GLOBAL ACTOR]: ", name, actor)
     }
 }
 
 globalThis.IMAGE = function (name, fileName) {
     gameInfo.images.push({
-        name: name,
-        fileName: fileName,
+        name,
+        fileName,
         image: null
     });
 }
 
-globalThis.ANIMATION = function (name, img, speed, def) {
+globalThis.SPRITE = function (name, imageName, sx, sy, width, height) {
+    gameInfo.sprites.push({
+        name,
+        imageName,
+        sx, sy,
+        width, height
+    });
+}
+
+globalThis.ANIMATION = function (name, imageName, duration, frameData) {
     gameInfo.animations.push({
-        name: name,
-        img: img,
-        speed: speed,
-        def: def
+        name,
+        imageName,
+        duration,
+        frameData
     });
 }
 
@@ -106,7 +112,6 @@ globalThis.SOUND = function (name, fileName, options) {
         volume: 1,
         ...options
     };
-    console.log(options)
 
     let sound = new GameSound({
         name: name,
@@ -406,13 +411,28 @@ function drawActor(actor) {
     applyFriction(actor, actor.rotateFriction, 'rotateSpeed')
 
     // Draw
-    let centerX = actor.image.image.width / 2;
-    let centerY = actor.image.image.height / 2;
+    let centerX = actor.image.width / 2;
+    let centerY = actor.image.height / 2;
     P5.push();
     P5.translate(actor.x + centerX, actor.y + centerY)
     P5.rotate(actor.rotation * D_PI)
     P5.translate(-centerX, -centerY)
-    P5.image(actor.image.image, 0, 0)
+    let sx = actor.image.sx;
+    let sy = actor.image.sy;
+    if (actor.image.animate) {
+        let frame = actor.image.frameData[actor.image.animationState.frame];        
+        sx = frame.x;
+        sy = frame.y;
+
+        if (P5.millis() > actor.image.animationState.lastTime) {            
+            actor.image.animationState.frame++;            
+            if (actor.image.animationState.frame >= actor.image.animationState.totalFrames) {
+                actor.image.animationState.frame = 0;
+            }
+            actor.image.animationState.lastTime = P5.millis() + frame.duration;
+        }        
+    }
+    P5.image(actor.image.image, 0, 0, actor.image.width, actor.image.height, sx, sy, actor.image.width, actor.image.height)
     P5.pop();
 }
 
@@ -497,6 +517,53 @@ function initialize() {
         canvas: canvas
     })
 
+    // Initialize sprites
+    gameInfo.sprites.forEach(spr => {
+        let img = gameInfo.images.find(i => i.name == spr.imageName);
+        gameInfo.images.push({
+            ...img,
+            ...spr
+        })
+    })
+
+    // Initialize animations
+    gameInfo.animations.forEach(a => {
+        let img = gameInfo.images.find(i => i.name == a.imageName);
+        let frameData = [];
+        let width = img.width;
+        let height = img.height;
+        if (typeof a.frameData[0] === 'number') {
+            let cols = a.frameData[0];
+            let rows = a.frameData[1];
+            width = img.width / cols;
+            height = img.height / rows;
+            for (let ih = 0; ih < rows; ih++) {
+                for (let iw = 0; iw < cols; iw++) {
+                    frameData.push({
+                        x: iw * width,
+                        y: ih * height,
+                        width: width,
+                        height: height,
+                        duration: a.duration
+                    })
+                }
+            }
+        }
+
+        gameInfo.images.push({
+            ...img,
+            ...a,
+            animate: true,
+            frameData,
+            width,
+            height,
+            animationState: {
+                ...img.animationState,
+                totalFrames: frameData.length,
+            }
+        })
+    })
+
     // Initialize rooms
     gameInfo.rooms.forEach(r => {
         currentRoomDef = r;
@@ -506,8 +573,6 @@ function initialize() {
         }
 
         r.actors.forEach(initializeActor)
-
-        console.log("Handled room: " + r.name, r)
     })
 
     gameInfo.actors.forEach(initializeActor)
@@ -616,8 +681,20 @@ P5.preload = function () {
     // Preload images
     // by doing this inside p5's preload(), setup() won't be called until all assets are loaded
     gameInfo.images.forEach(img => {
-        img.image = P5.loadImage(img.fileName);
-    })
+        img.image = P5.loadImage(img.fileName, image => {
+            img.sx = img.sx ?? 0;
+            img.sy = img.sy ?? 0;
+            img.width = img.image.width;
+            img.height = img.image.height;
+            img.animate = false;
+            img.frameData = [];
+            img.animationState = {
+                frame: 0,
+                lastTime: 0,
+                totalFrames: 1
+            };
+        });        
+    })    
 
     // Preload sounds
     gameInfo.sounds.forEach(sound => {

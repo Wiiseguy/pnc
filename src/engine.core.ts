@@ -129,6 +129,7 @@ export class GameInfo {
     rooms = [];
     actors: GameActor[] = [];
     images = [];
+    sprites = [];
     sounds: GameSound[] = [];
     animations = [];
 
