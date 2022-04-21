@@ -9,10 +9,12 @@ FONTSIZE(32)
 //NOINTRO()
 BGCOLOR('#ff00ff')
 
-STARTROOM("Hallway_Left")
+//STARTROOM("Hallway_Left")
+STARTROOM("Bedroom")
 
 // Room - Bedroom
 IMAGE("BedroomBG", require('url:./data/TestAdv/Bedroom/Bedroom.png'))
+IMAGE("Box", require('url:./data/TestAdv/Bedroom/Box.png'))
 
 // Room - Left Room
 IMAGE("Hallway_LeftBG", require('url:./data/TestAdv/Hallway_Left/Hallway_LeftBG.png'))
@@ -24,6 +26,9 @@ IMAGE("Fidget", require('url:./data/TestAdv/Hallway_Left/Fidget.png'))
 IMAGE("Hallway_RightBG", require('url:./data/TestAdv/HallWay_Right/HallWay_RightBG.png'))
 IMAGE("Painting", require('url:./data/TestAdv/HallWay_Right/Painting.png'))
 IMAGE("WallSafe", require('url:./data/TestAdv/HallWay_Right/WallSafe.png'))
+
+// Closet
+IMAGE("ClosetBG", require('url:./data/TestAdv/Closet/ClosetBG.png'))
 
 // Room - Kitchen
 IMAGE("KitchenBG", require('url:./data/TestAdv/KitchenRoom/KitchenBG.png'))
@@ -58,6 +63,14 @@ ROOM("Bedroom", () => {
             None
     */
     BACKGROUND("BedroomBG")
+
+    ACTOR("Box", {
+        x: 478,
+        y: 335,
+        image: "Box"
+    })
+
+
     HOTSPOT("gotoHallway_Right", 294, 114, 390, 307)
 
     ONCE(() => {
@@ -163,7 +176,7 @@ ROOM("Hallway_Left", () => {
 
     CLICK("gotoCloset", () => {
         if (hasTestActorMoved) {
-            SHOWTEXT("COMING SOON (TM)")
+            GOTO("Closet")
         }
         else {
             SHOWTEXT("TestActor is in the way")
@@ -233,6 +246,28 @@ ROOM("Hallway_Right", () => {
         if (fridgeOpen) {
             SHOWTEXT("You left the fridge wide open, you doofus!")
         }
+    })
+})
+
+
+ROOM("Closet", () => {
+    /*
+        Closet Puzzle
+            Light is off, pull string snapped, get box from bedroom to reach
+    */
+    BACKGROUND("ClosetBG")
+
+    HOTSPOT("gotoHallway_Left", 190, 370, 452, 400)
+
+    ACTOR("Box", {
+        x: 300,
+        y: 299,
+        image: "Box",
+        visible: false
+    })
+
+    CLICK("gotoHallway_Left", () => {
+        GOTO("Hallway_Left")
     })
 })
 
