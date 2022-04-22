@@ -56,6 +56,7 @@ SPRITE("TestSprite", "TestActor", 10, 0, 29, 26.5)
 // Animations
 ANIMATION("AnimatedBats", "BatStrip", 200, [2, 1]) // 2 columns, 1 row (2 frames)
 
+// TODO: Global ONCE() ?
 
 ROOM("Bedroom", () => {
     /*
@@ -74,18 +75,18 @@ ROOM("Bedroom", () => {
     HOTSPOT("gotoHallway_Right", 294, 114, 390, 307)
 
     ONCE(() => {
-        WAIT(1000)
-        SHOWTEXT("DRIP.")
-        WAIT(500)
-        SHOWTEXT("DRIP..")
-        WAIT(500)
-        SHOWTEXT("DRIP...")
-        WAIT(500)
-        SHOWTEXT("Can someone fix that faucet dripping please?!!")
-        WAIT(1000)
-        SHOWTEXT("i'M! TRYING! TO! SLEEP!")
-        WAIT(1000)
-        SHOWTEXT("DRIP....")
+        //WAIT(1000)
+        //SHOWTEXT("DRIP.")
+        // WAIT(500)
+        // SHOWTEXT("DRIP..")
+        // WAIT(500)
+        // SHOWTEXT("DRIP...")
+        // WAIT(500)
+        // SHOWTEXT("Can someone fix that faucet dripping please?!!")
+        // WAIT(1000)
+        // SHOWTEXT("i'M! TRYING! TO! SLEEP!")
+        // WAIT(1000)
+        // SHOWTEXT("DRIP....")
         SHOWTEXT("FINE! I'LL FIX IT MYSELF! UGH!")
     })
 
