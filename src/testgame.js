@@ -49,10 +49,11 @@ SOUND("kitchen", require("url:./data/62215.wav"))
 SOUND("bg", require("url:./data/chill.mp3"), { volume: 0.3 }) // Credit: https://www.looperman.com/loops/detail/289801/lenoxbeatmaker-sativaskunk-free-146bpm-jazz-electric-guitar-loop
 
 // Global vars
-let hasCheese = false
 let fridgeOpen = false
 let closetLightsOn = false
+let gotCheese = false
 let gotPipeWrentch = false
+let gotBox = false
 
 // Sprites
 SPRITE("TestSprite", "TestActor", 10, 0, 29, 26.5)
@@ -96,6 +97,12 @@ ROOM("Bedroom", () => {
 
     CLICK("gotoHallway_Right", () => {
         GOTO("Hallway_Right")
+    })
+
+    CLICK("Box", () => {
+        SHOWTEXT("Hmm, this box might come in handy.")
+        HIDEACTOR("Box")
+        gotBox = true
     })
 })
 
@@ -161,7 +168,7 @@ ROOM("Hallway_Left", () => {
     })
 
     CLICK("mouseHole", () => {
-        if (hasCheese) {
+        if (gotCheese) {
             SHOWTEXT("Maybe the little thing likes cheese.")
             SHOWACTOR("Cheese")
             WAIT(1000)
@@ -263,6 +270,7 @@ ROOM("Closet", () => {
     BACKGROUND("ClosetBG")
 
     HOTSPOT("gotoHallway_Left", 190, 370, 452, 400)
+    HOTSPOT("Light", 304, 0, 338, 60)
 
     ACTOR("Toolbox", {
         x: 269,
@@ -290,13 +298,31 @@ ROOM("Closet", () => {
 
     CLICK("Toolbox", () => {
         if (closetLightsOn) {
-            SHOWTEXT("Ahh.. the mighty pipe wrench!")
-            gotPipeWrentch = true;
+            if (!gotPipeWrentch) {
+                SHOWTEXT("Ahh.. the mighty pipe wrench!")
+                gotPipeWrentch = true;
+            }
         }
         else {
             SHOWTEXT("There are a bunch of sharp things in there, i need to turn the light on first.")
         }
     })
+
+    CLICK("Light", () => {
+        if (gotBox) {
+            if (!closetLightsOn) {
+                SHOWTEXT("Maybe i can use this box to stand on.")
+                SHOWACTOR("Box")
+                WAIT(500)
+                HIDEACTOR("ClosetShadow")
+                closetLightsOn = true
+            }
+        }
+        else {
+            SHOWTEXT("I cannot reach the light, i need something to stand on.")
+        }
+    })
+
 })
 
 
@@ -336,7 +362,7 @@ ROOM("KitchenRoom", () => {
     CLICK("FridgeDoorClosed", () => {
         HIDEACTOR("FridgeDoorClosed")
         SHOWACTOR("FridgeDoorOpen")
-        if (!hasCheese) {
+        if (!gotCheese) {
             SHOWACTOR("Cheese")
         }
         fridgeOpen = true
@@ -350,8 +376,9 @@ ROOM("KitchenRoom", () => {
     })
 
     VERB('use', "Cheese", () => {
+        SHOWTEXT("This puzzle is so cheesy..")
         HIDEACTOR("Cheese")
-        hasCheese = true
+        gotCheese = true
     })
 
     ENTER(() => {
