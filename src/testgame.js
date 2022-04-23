@@ -29,6 +29,9 @@ IMAGE("WallSafe", require('url:./data/TestAdv/HallWay_Right/WallSafe.png'))
 
 // Closet
 IMAGE("ClosetBG", require('url:./data/TestAdv/Closet/ClosetBG.png'))
+IMAGE("ClosetShadow", require('url:./data/TestAdv/Closet/ClosetShadow.png'))
+IMAGE("Toolbox", require('url:./data/TestAdv/Closet/Toolbox.png'))
+
 
 // Room - Kitchen
 IMAGE("KitchenBG", require('url:./data/TestAdv/KitchenRoom/KitchenBG.png'))
@@ -48,7 +51,8 @@ SOUND("bg", require("url:./data/chill.mp3"), { volume: 0.3 }) // Credit: https:/
 // Global vars
 let hasCheese = false
 let fridgeOpen = false
-
+let closetLightsOn = false
+let gotPipeWrentch = false
 
 // Sprites
 SPRITE("TestSprite", "TestActor", 10, 0, 29, 26.5)
@@ -260,15 +264,38 @@ ROOM("Closet", () => {
 
     HOTSPOT("gotoHallway_Left", 190, 370, 452, 400)
 
+    ACTOR("Toolbox", {
+        x: 269,
+        y: 286,
+        image: "Toolbox"
+    })
+
     ACTOR("Box", {
-        x: 300,
-        y: 299,
+        x: 340,
+        y: 330,
         image: "Box",
         visible: false
     })
 
+    ACTOR("ClosetShadow", {
+        x: 203,
+        y: 0,
+        image: "ClosetShadow",
+        alpha: 230
+    })
+
     CLICK("gotoHallway_Left", () => {
         GOTO("Hallway_Left")
+    })
+
+    CLICK("Toolbox", () => {
+        if (closetLightsOn) {
+            SHOWTEXT("Ahh.. the mighty pipe wrench!")
+            gotPipeWrentch = true;
+        }
+        else {
+            SHOWTEXT("There are a bunch of sharp things in there, i need to turn the light on first.")
+        }
     })
 })
 

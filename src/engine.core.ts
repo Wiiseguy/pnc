@@ -62,7 +62,8 @@ export class GameActor extends GameObject {
     imageName: string;
     image: P5.Image;
     visible: boolean;
-    constructor(name: string, x: number, y: number, imageName: string, visible: boolean) {
+    alpha: number;
+    constructor(name: string, x: number, y: number, imageName: string, visible: boolean, alpha: number) {
         super();
         this.name = name;
         this.initialX = x;
@@ -72,6 +73,7 @@ export class GameActor extends GameObject {
         this.imageName = imageName;
         this.actions = [];
         this.visible = visible ?? true;
+        this.alpha = alpha ?? 255;
     }
 }
 

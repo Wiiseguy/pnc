@@ -66,7 +66,7 @@ globalThis.STARTROOM = function (room) {
 
 
 globalThis.ACTOR = function (name, def) {
-    let actor = new GameActor(name, def.x, def.y, def.image, def.visible);
+    let actor = new GameActor(name, def.x, def.y, def.image, def.visible, def.alpha);
     actor.rotation = def.rotation ?? 0;
     actor.scale = def.scale ?? 1;
     actor.rotateSpeed = def.rotateSpeed ?? 0;
@@ -432,6 +432,7 @@ function drawActor(actor) {
             actor.image.animationState.lastTime = P5.millis() + frame.duration;
         }        
     }
+    P5.tint(255,actor.alpha)
     P5.image(actor.image.image, 0, 0, actor.image.width, actor.image.height, sx, sy, actor.image.width, actor.image.height)
     P5.pop();
 }
