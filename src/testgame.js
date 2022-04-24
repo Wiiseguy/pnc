@@ -9,8 +9,8 @@ FONTSIZE(32)
 //NOINTRO()
 BGCOLOR('#ff00ff')
 
-//STARTROOM("Hallway_Left")
-STARTROOM("Bedroom")
+STARTROOM("Hallway_Left")
+//STARTROOM("Bedroom")
 
 // Room - Bedroom
 IMAGE("BedroomBG", require('url:./data/TestAdv/Bedroom/Bedroom.png'))
@@ -135,6 +135,12 @@ ROOM("Hallway_Left", () => {
         y: 20,
         image: "TestSprite",
         rotation: 0,
+        //gravity: 0.1,
+        behaviors: {
+            drag: {
+                // Drag options
+            }
+        }
     })
 
     ACTOR("bats", {
@@ -142,6 +148,9 @@ ROOM("Hallway_Left", () => {
         y: 40,
         image: "AnimatedBats",
         rotation: 0,
+        behaviors: {
+            drag: {}
+        }
     })
 
     ACTOR("Shelf", {
@@ -384,6 +393,45 @@ ROOM("KitchenRoom", () => {
     ENTER(() => {
         //PLAYSOUND("kitchen")
     })
+})
+
+BEHAVIOR('drag', {
+    state() {
+        return {
+            isDragging: false,
+            dragStartX: 0,
+            dragStartY: 0,
+        }
+    },
+    create() {
+
+    },
+    /**
+     * 
+     * @param {GameActor} actor 
+     * @param {p5} p5 
+     * @param {GameInfo} gameInfo 
+     */
+    update(actor, p5, gameInfo) {
+        if (p5.mouseIsPressed) {
+            if (actor.boundingBox.contains(p5.mouseX, p5.mouseY) && !gameInfo._isDragging) {   // gameInfo check is to prevent other objects from being dragged              
+                if (!actor.isDragging) {
+                    actor.dragStartX = p5.mouseX - actor.x;
+                    actor.dragStartY = p5.mouseY - actor.y;
+                }
+                actor.isDragging = true;
+                gameInfo._isDragging = true;
+            }
+        } else {
+            actor.isDragging = false;
+            gameInfo._isDragging = false;
+        }
+
+        if (actor.isDragging) {
+            actor.x = p5.mouseX - actor.dragStartX;
+            actor.y = p5.mouseY - actor.dragStartY;
+        }
+    }
 })
 
 // // Custom test

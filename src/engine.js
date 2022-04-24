@@ -3,7 +3,7 @@ const { SoundFile } = require("p5");
 const p5 = require("p5");
 globalThis.p5 = p5;
 const p5sound = require("p5/lib/addons/p5.sound");
-const { GameInfo, CustomContext, GameHotspot, GameRoom, GameAction, GameActor, GameSound } = require("./engine.core");
+const { GameInfo, CustomContext, GameHotspot, GameRoom, GameAction, GameActor, GameSound, BoundingBox } = require("./engine.core");
 
 const P5 = new p5(() => 1337);
 globalThis.P5 = P5;
@@ -66,10 +66,32 @@ globalThis.STARTROOM = function (room) {
 
 
 globalThis.ACTOR = function (name, def) {
-    let actor = new GameActor(name, def.x, def.y, def.image, def.visible, def.alpha);
+    let actor = new GameActor(name, def.x, def.y, def.image, def.visible);
     actor.rotation = def.rotation ?? 0;
     actor.scale = def.scale ?? 1;
     actor.rotateSpeed = def.rotateSpeed ?? 0;
+    actor.gravity = def.gravity ?? 0;
+    actor.friction = def.friction ?? 0;
+    actor.xSpeed = def.xSpeed ?? 0;
+    actor.ySpeed = def.ySpeed ?? 0;
+    actor.alpha = def.alpha ?? 255;
+
+    // Handle behaviors
+    let behaviors = [];
+    if (def.behaviors) {
+        Object.entries(def.behaviors).forEach(([behaviorName, behavior]) => {
+            let behaviorDef = gameInfo.behaviors.find(behaviorDef => behaviorDef.name === behaviorName);
+            if (!behaviorDef) {
+                console.warn(`[ACTOR] Behavior ${behaviorName} not found`);
+                return;
+            }
+            behaviors.push({ name: behaviorName, options: behavior, behavior: behaviorDef });
+            if (behaviorDef.state) {
+                Object.assign(actor, behaviorDef.state())
+            }
+        });
+    }
+    actor.behaviors = behaviors;
 
     // If we're current handling room defs, add the actor to the current room
     if (currentRoomDef) {
@@ -135,6 +157,13 @@ globalThis.ROOM = function (name, def) {
         onEnterOnce: function () { },
         _doneEnterOnce: false
     });
+}
+
+globalThis.BEHAVIOR = function (name, behavior) {
+    gameInfo.behaviors.push({
+        name,
+        ...behavior
+    })
 }
 
 // Room functions
@@ -391,6 +420,7 @@ function getRoomActor(name) {
 
 function initializeActor(actor) {
     actor.image = getImage(actor.imageName);
+    actor.boundingBox = new BoundingBox(actor.x, actor.y, actor.image.width, actor.image.height);
 }
 
 function applyFriction(obj, friction, propName) {
@@ -403,12 +433,20 @@ function applyFriction(obj, friction, propName) {
     }
 }
 
-
+/**
+ * 
+ * @param {GameActor} actor 
+ * @returns 
+ */
 function drawActor(actor) {
     if (!actor.visible) return;
     // Update props
+    actor.x += actor.xSpeed;
+    actor.y += actor.ySpeed;
+    actor.ySpeed += actor.gravity;
     actor.rotation += actor.rotateSpeed;
     applyFriction(actor, actor.rotateFriction, 'rotateSpeed')
+    applyFriction(actor, actor.friction, 'xSpeed')
 
     // Draw
     let centerX = actor.image.width / 2;
@@ -420,21 +458,96 @@ function drawActor(actor) {
     let sx = actor.image.sx;
     let sy = actor.image.sy;
     if (actor.image.animate) {
-        let frame = actor.image.frameData[actor.image.animationState.frame];        
+        let frame = actor.image.frameData[actor.image.animationState.frame];
         sx = frame.x;
         sy = frame.y;
 
-        if (P5.millis() > actor.image.animationState.lastTime) {            
-            actor.image.animationState.frame++;            
+        if (P5.millis() > actor.image.animationState.lastTime) {
+            actor.image.animationState.frame++;
             if (actor.image.animationState.frame >= actor.image.animationState.totalFrames) {
                 actor.image.animationState.frame = 0;
             }
             actor.image.animationState.lastTime = P5.millis() + frame.duration;
-        }        
+        }
     }
-    P5.tint(255,actor.alpha)
+    P5.tint(255, actor.alpha)
     P5.image(actor.image.image, 0, 0, actor.image.width, actor.image.height, sx, sy, actor.image.width, actor.image.height)
     P5.pop();
+
+    // Handle behaviors
+    actor.behaviors.forEach(b => {
+        if (b.behavior.update) b.behavior.update(actor, P5, gameInfo);
+        if (b.behavior.draw) b.behavior.draw(actor, P5, gameInfo);
+    });
+}
+
+function onMousePress(e) {
+    if (isActionRunning) {
+        console.log("Blocked click, because isActionRunning == true");
+        return;
+    }
+    if (P5.mouseButton != 'left') return;
+
+    isMouseDown = true;
+
+    let action = null;
+    let target = null;
+
+    for (let i = currentRoom.actors.length - 1; i >= 0; i--) {
+        let a = currentRoom.actors[i];
+        if (!a.visible) continue; // Skip to next if actor is not visible
+        if (P5.mouseX >= a.x && P5.mouseX <= a.x + a.image.image.width && P5.mouseY >= a.y && P5.mouseY <= a.y + a.image.image.height) {
+            action = getActionByNameOrWildcard(a.actions, currentVerb);
+            if (action) {
+                target = a;
+                break; // Quit looking and break from for loop
+            }
+        }
+    }
+
+    // If no actor actions were found, try hotspots
+    if (!action) {
+        for (let i = currentRoom.hotspots.length - 1; i >= 0; i--) {
+            let h = currentRoom.hotspots[i];
+            if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
+                action = getActionByNameOrWildcard(h.actions, currentVerb);
+                if (action) {
+                    target = h;
+                    break; // Quit looking and break from for loop
+                }
+            }
+        }
+    }
+
+    if (action) {
+        console.group("Action", action)
+        action.action(target);
+        console.groupEnd('Action')
+    }
+}
+
+function onMouseRelease(e) {
+    isMouseDown = false;
+}
+
+function onRightClick(e) {
+    // Disables context menu from appearing
+    e.preventDefault();
+
+    // Change the current verb
+    let currentVerbIndex = verbs.indexOf(currentVerb);
+    let newCurrentVerbIndex = (currentVerbIndex + 1) % verbs.length;
+    currentVerb = verbs[newCurrentVerbIndex];
+    return false;
+}
+
+function onKeyPress(e) {
+    console.log(e);
+
+    if (e.code == 'KeyD') {
+        isDebug = !isDebug;
+        console.log("Debug mode:", isDebug);
+    }
 }
 
 function initialize() {
@@ -442,75 +555,12 @@ function initialize() {
 
     const canvas = P5.createCanvas(gameInfo.width, gameInfo.height);
 
-    canvas.mousePressed(function (e) {
-        if (isActionRunning) {
-            console.log("Blocked click, because isActionRunning == true");
-            return;
-        }
-        if (P5.mouseButton != 'left') return;
-
-        isMouseDown = true;
-
-        let action = null;
-        let target = null;
-
-        for (let i = currentRoom.actors.length - 1; i >= 0; i--) {
-            let a = currentRoom.actors[i];
-            if (!a.visible) continue; // Skip to next if actor is not visible
-            if (P5.mouseX >= a.x && P5.mouseX <= a.x + a.image.image.width && P5.mouseY >= a.y && P5.mouseY <= a.y + a.image.image.height) {
-                action = getActionByNameOrWildcard(a.actions, currentVerb);
-                if (action) {
-                    target = a;
-                    break; // Quit looking and break from for loop
-                }
-            }
-        }
-
-        // If no actor actions were found, try hotspots
-        if (!action) {
-            for (let i = currentRoom.hotspots.length - 1; i >= 0; i--) {
-                let h = currentRoom.hotspots[i];
-                if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
-                    action = getActionByNameOrWildcard(h.actions, currentVerb);
-                    if (action) {
-                        target = h;
-                        break; // Quit looking and break from for loop
-                    }
-                }
-            }
-        }
-
-        if (action) {
-            console.group("Action", action)
-            action.action(target);
-            console.groupEnd('Action')
-        }
-    });
-
-    canvas.mouseReleased(e => {
-        isMouseDown = false;
-    });
-
+    // Bind DOM events
+    P5.keyPressed = onKeyPress;
+    canvas.mousePressed(onMousePress);
+    canvas.mouseReleased(onMouseRelease);
     // Disable right click and handle verb change
-    canvas.elt.addEventListener('contextmenu', e => {
-        // Disables context menu from appearing
-        e.preventDefault();
-
-        // Change the current verb
-        let currentVerbIndex = verbs.indexOf(currentVerb);
-        let newCurrentVerbIndex = (currentVerbIndex + 1) % verbs.length;
-        currentVerb = verbs[newCurrentVerbIndex];
-        return false;
-    });
-
-    P5.keyPressed = function (e) {
-        console.log(e);
-
-        if (e.code == 'KeyD') {
-            isDebug = !isDebug;
-            console.log("Debug mode:", isDebug);
-        }
-    }
+    canvas.elt.addEventListener('contextmenu', onRightClick);
 
     const context = new CustomContext({
         p5: P5,
@@ -606,7 +656,31 @@ function initialize() {
         }
 
         if (isDebug) {
-            // Draw Hotspots (DEBUG)
+            // Draw Actor hotspots
+            currentRoom.actors.forEach(h => {
+                P5.push()
+                P5.noStroke()
+
+                P5.fill(0, 0, 200, 60)
+
+                // If the actor has an action for the current verb, draw a yellow box
+                if (h.actions.some(a => a.name === currentVerb || a.name === '*')) {
+                    P5.fill(200, 200, 0, 128)
+                }
+                // If the hotspot is highlighted by the cursor, draw a red box
+                if (h.boundingBox.contains(P5.mouseX, P5.mouseY)) {
+                    P5.fill(255, 0, 0, 128)
+                }
+
+                P5.rect(h.boundingBox.x, h.boundingBox.y, h.boundingBox.width, h.boundingBox.height)
+                P5.fill(200)
+
+                P5.textSize(16)
+                P5.textAlign("right", "bottom")
+                P5.text(h.name, h.x2, h.y2)
+                P5.pop()
+            })
+            // Draw Hotspots
             currentRoom.hotspots.forEach(h => {
                 P5.push()
                 P5.noStroke()
@@ -615,11 +689,11 @@ function initialize() {
 
                 // If the hotspot has an action for the current verb, draw a yellow box
                 if (h.actions.some(a => a.name === currentVerb || a.name === '*')) {
-                    P5.fill(200, 200, 0, 128)
+                    P5.fill(200, 200, 0, 80)
                 }
                 // If the hotspot is highlighted by the cursor, draw a red box
                 if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
-                    P5.fill(255, 0, 0, 128)
+                    P5.fill(255, 200, 0, 128)
                 }
 
                 P5.rect(h.x1, h.y1, h.x2 - h.x1, h.y2 - h.y1)
@@ -694,8 +768,8 @@ P5.preload = function () {
                 lastTime: 0,
                 totalFrames: 1
             };
-        });        
-    })    
+        });
+    })
 
     // Preload sounds
     gameInfo.sounds.forEach(sound => {

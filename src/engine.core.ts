@@ -27,12 +27,39 @@ export class CustomContext {
     }
 }
 
+export class BoundingBox {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    constructor(x, y, width, height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+    contains(x, y) {
+        return x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height;
+    }
+}
+
 export class GameObject {
-    x: number = 0;
-    y: number = 0;
+    _x = 0;
+    _y = 0;
+    get x() { return this._x };
+    get y() { return this._y };
+    set x(value) {
+        this._x = value;
+        this.boundingBox.x = value;        
+    }
+    set y(value) {
+        this._y = value;
+        this.boundingBox.y = value;
+    }
     xSpeed: number = 0;
     ySpeed: number = 0;
     friction: number = 0;
+    gravity: number = 0;
 
     fade: number = 1;
     scale: number = 1;
@@ -40,6 +67,8 @@ export class GameObject {
     rotation: number = 0;
     rotateSpeed: number = 0;
     rotateFriction: number = 0;
+
+    boundingBox: BoundingBox = new BoundingBox(0, 0, 0, 0);
 }
 
 export class GameSound {
@@ -63,7 +92,8 @@ export class GameActor extends GameObject {
     image: P5.Image;
     visible: boolean;
     alpha: number;
-    constructor(name: string, x: number, y: number, imageName: string, visible: boolean, alpha: number) {
+    behaviors = [];
+    constructor(name: string, x: number, y: number, imageName: string, visible: boolean) {
         super();
         this.name = name;
         this.initialX = x;
@@ -73,7 +103,6 @@ export class GameActor extends GameObject {
         this.imageName = imageName;
         this.actions = [];
         this.visible = visible ?? true;
-        this.alpha = alpha ?? 255;
     }
 }
 
@@ -86,6 +115,7 @@ export class GameAction {
     }
 }
 
+// TODO: use BoundingBox in hotspots
 export class GameHotspot {
     name: string;
     x1: number;
@@ -134,6 +164,7 @@ export class GameInfo {
     sprites = [];
     sounds: GameSound[] = [];
     animations = [];
+    behaviors = [];
 
     customInit = [];
     customDraw = [];
