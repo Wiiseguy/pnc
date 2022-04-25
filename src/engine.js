@@ -250,7 +250,7 @@ function unimplemented() {
     console.warn("Unimplemented", ...arguments)
 }
 globalThis.SHOWTEXT = function (text) {
-    let duration = 1000 + text.length * 10;
+    let duration = 1000 + text.length * 20;
     addAction('ShowText', () => {
         console.log("ShowText:", ...arguments)
         currentText = text;

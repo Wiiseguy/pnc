@@ -181,6 +181,10 @@ ROOM("Hallway_Left", () => {
     })
 
     CLICK("mouseHole", () => {
+        if (hasTestActorMoved) {
+            SHOWTEXT("I didn't see anything, but it scared TestActor away.")
+            return;
+        }
         if (gotCheese) {
             SHOWTEXT("Maybe the little thing likes cheese.")
             SHOWACTOR("Cheese")
