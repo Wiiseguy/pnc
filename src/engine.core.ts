@@ -44,6 +44,10 @@ export class BoundingBox {
 }
 
 export class GameObject {
+    initialX: number = 0;
+    initialY: number = 0;
+    initialWidth: number = null;
+    initialHeight: number = null;
     _x = 0;
     _y = 0;
     get x() { return this._x };
@@ -86,8 +90,6 @@ export class GameSound {
 export class GameActor extends GameObject {
     name: string;
     actions: GameAction[];
-    initialX: number;
-    initialY: number;
     imageName: string;
     image: P5.Image;
     visible: boolean;
@@ -115,27 +117,10 @@ export class GameAction {
     }
 }
 
-// TODO: use BoundingBox in hotspots
-export class GameHotspot {
-    name: string;
-    x1: number;
-    y1: number;
-    x2: number;
-    y2: number;
-    actions: GameAction[];
-    constructor(c) {
-        this.name = c.name;
-        this.x1 = c.x1;
-        this.y1 = c.y1;
-        this.x2 = c.x2;
-        this.y2 = c.y2;
-        this.actions = c.actions;
-    }
-}
 
 export class GameRoom {
     name: string;
-    hotspots: GameHotspot[];
+    hotspots: GameActor[];
     actors: GameActor[];
     constructor(c) {
         this.name = c.name;

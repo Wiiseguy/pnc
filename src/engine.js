@@ -3,7 +3,7 @@ const { SoundFile } = require("p5");
 const p5 = require("p5");
 globalThis.p5 = p5;
 const p5sound = require("p5/lib/addons/p5.sound");
-const { GameInfo, CustomContext, GameHotspot, GameRoom, GameAction, GameActor, GameSound, BoundingBox } = require("./engine.core");
+const { GameInfo, CustomContext, GameRoom, GameAction, GameActor, GameSound, BoundingBox } = require("./engine.core");
 
 const P5 = new p5(() => 1337);
 globalThis.P5 = P5;
@@ -75,6 +75,8 @@ globalThis.ACTOR = function (name, def) {
     actor.xSpeed = def.xSpeed ?? 0;
     actor.ySpeed = def.ySpeed ?? 0;
     actor.alpha = def.alpha ?? 255;
+    actor.initialWidth = def.width;
+    actor.initialHeight = def.height;
 
     // Handle behaviors
     let behaviors = [];
@@ -174,14 +176,9 @@ globalThis.DESCRIPTION = function (desc) {
     currentRoomDef.description = desc;
 }
 globalThis.HOTSPOT = function (name, x1, y1, x2, y2) {
-    currentRoomDef.hotspots.push(new GameHotspot({
-        name: name,
-        x1: x1,
-        y1: y1,
-        x2: x2,
-        y2: y2,
-        actions: []
-    }));
+    let actor = new GameActor(name, x1, y1, null, false);
+    actor.boundingBox = new BoundingBox(x1, y1, x2 - x1, y2 - y1);
+    currentRoomDef.hotspots.push(actor);
 }
 globalThis.VERB = function (verb, subject, action) {
     let actor = currentRoomDef.actors.find(actor => actor.name === subject);
@@ -419,8 +416,14 @@ function getRoomActor(name) {
 }
 
 function initializeActor(actor) {
-    actor.image = getImage(actor.imageName);
-    actor.boundingBox = new BoundingBox(actor.x, actor.y, actor.image.width, actor.image.height);
+    if (actor.imageName) {
+        actor.image = getImage(actor.imageName);
+        actor.boundingBox = new BoundingBox(actor.x, actor.y, actor.image.width, actor.image.height);
+    } else {
+        if (actor.initialWidth == null) throw new Error('If no image is specified, initialWidth must be specified');
+        if (actor.initialHeight == null) throw new Error('If no image is specified, initialHeight must be specified');
+        actor.boundingBox = new BoundingBox(actor.x, actor.y, actor.initialWidth, actor.initialHeight);
+    }
 }
 
 function applyFriction(obj, friction, propName) {
@@ -449,30 +452,32 @@ function drawActor(actor) {
     applyFriction(actor, actor.friction, 'xSpeed')
 
     // Draw
-    let centerX = actor.image.width / 2;
-    let centerY = actor.image.height / 2;
-    P5.push();
-    P5.translate(actor.x + centerX, actor.y + centerY)
-    P5.rotate(actor.rotation * D_PI)
-    P5.translate(-centerX, -centerY)
-    let sx = actor.image.sx;
-    let sy = actor.image.sy;
-    if (actor.image.animate) {
-        let frame = actor.image.frameData[actor.image.animationState.frame];
-        sx = frame.x;
-        sy = frame.y;
+    if (actor.image) {
+        let centerX = actor.image.width / 2;
+        let centerY = actor.image.height / 2;
+        P5.push();
+        P5.translate(actor.x + centerX, actor.y + centerY)
+        P5.rotate(actor.rotation * D_PI)
+        P5.translate(-centerX, -centerY)
+        let sx = actor.image.sx;
+        let sy = actor.image.sy;
+        if (actor.image.animate) {
+            let frame = actor.image.frameData[actor.image.animationState.frame];
+            sx = frame.x;
+            sy = frame.y;
 
-        if (P5.millis() > actor.image.animationState.lastTime) {
-            actor.image.animationState.frame++;
-            if (actor.image.animationState.frame >= actor.image.animationState.totalFrames) {
-                actor.image.animationState.frame = 0;
+            if (P5.millis() > actor.image.animationState.lastTime) {
+                actor.image.animationState.frame++;
+                if (actor.image.animationState.frame >= actor.image.animationState.totalFrames) {
+                    actor.image.animationState.frame = 0;
+                }
+                actor.image.animationState.lastTime = P5.millis() + frame.duration;
             }
-            actor.image.animationState.lastTime = P5.millis() + frame.duration;
         }
+        P5.tint(255, actor.alpha)
+        P5.image(actor.image.image, 0, 0, actor.image.width, actor.image.height, sx, sy, actor.image.width, actor.image.height)
+        P5.pop();
     }
-    P5.tint(255, actor.alpha)
-    P5.image(actor.image.image, 0, 0, actor.image.width, actor.image.height, sx, sy, actor.image.width, actor.image.height)
-    P5.pop();
 
     // Handle behaviors
     actor.behaviors.forEach(b => {
@@ -496,7 +501,7 @@ function onMousePress(e) {
     for (let i = currentRoom.actors.length - 1; i >= 0; i--) {
         let a = currentRoom.actors[i];
         if (!a.visible) continue; // Skip to next if actor is not visible
-        if (P5.mouseX >= a.x && P5.mouseX <= a.x + a.image.image.width && P5.mouseY >= a.y && P5.mouseY <= a.y + a.image.image.height) {
+        if (a.boundingBox.contains(P5.mouseX, P5.mouseY)) {
             action = getActionByNameOrWildcard(a.actions, currentVerb);
             if (action) {
                 target = a;
@@ -509,7 +514,7 @@ function onMousePress(e) {
     if (!action) {
         for (let i = currentRoom.hotspots.length - 1; i >= 0; i--) {
             let h = currentRoom.hotspots[i];
-            if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
+            if (h.boundingBox.contains(P5.mouseX, P5.mouseY)) {
                 action = getActionByNameOrWildcard(h.actions, currentVerb);
                 if (action) {
                     target = h;
@@ -667,7 +672,7 @@ function initialize() {
                 if (h.actions.some(a => a.name === currentVerb || a.name === '*')) {
                     P5.fill(200, 200, 0, 128)
                 }
-                // If the hotspot is highlighted by the cursor, draw a red box
+                // If the actor is highlighted by the cursor, draw a red box
                 if (h.boundingBox.contains(P5.mouseX, P5.mouseY)) {
                     P5.fill(255, 0, 0, 128)
                 }
@@ -692,11 +697,11 @@ function initialize() {
                     P5.fill(200, 200, 0, 80)
                 }
                 // If the hotspot is highlighted by the cursor, draw a red box
-                if (P5.mouseX >= h.x1 && P5.mouseX <= h.x2 && P5.mouseY >= h.y1 && P5.mouseY <= h.y2) {
+                if (h.boundingBox.contains(P5.mouseX, P5.mouseY)) {
                     P5.fill(255, 200, 0, 128)
                 }
 
-                P5.rect(h.x1, h.y1, h.x2 - h.x1, h.y2 - h.y1)
+                P5.rect(h.boundingBox.x, h.boundingBox.y, h.boundingBox.width, h.boundingBox.height)
                 P5.fill(200)
 
 
