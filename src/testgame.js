@@ -60,7 +60,7 @@ let gotBox = false
 SPRITE("TestSprite", "TestActor", 10, 0, 29, 26.5)
 
 // Animations
-ANIMATION("AnimatedBats", "BatStrip", 200, [2, 1]) // 2 columns, 1 row (2 frames)
+ANIMATION("AnimatedBats", "BatStrip", 200, [3, 1]) // 2 columns, 1 row (2 frames)
 
 // TODO: Global ONCE() ?
 
