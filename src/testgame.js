@@ -53,7 +53,7 @@ let fridgeOpen = false
 let closetLightsOn = false
 let hasTestActorMoved = false
 let gotCheese = false
-let gotPipeWrentch = false
+let gotPipeWrench = false
 let gotBox = false
 
 // Sprites
@@ -315,9 +315,9 @@ ROOM("Closet", () => {
 
     CLICK("Toolbox", () => {
         if (closetLightsOn) {
-            if (!gotPipeWrentch) {
+            if (!gotPipeWrench) {
                 SHOWTEXT("Ahh.. the mighty pipe wrench!")
-                gotPipeWrentch = true;
+                gotPipeWrench = true;
             }
         }
         else {
