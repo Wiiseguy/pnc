@@ -14,7 +14,7 @@ const D_PI = Math.PI / 180;
 const gameInfo = new GameInfo();
 let verbs = ['use']
 
-let isDebug = false;
+let isDebug = !!localStorage.debug;
 let currentRoomDef = null;
 /** @type {GameRoom} */
 let currentRoom = null;
@@ -389,6 +389,7 @@ function setRoom(room) {
         currentRoom._doneEnterOnce = true;
         currentRoom.onEnterOnce();
     }
+    localStorage.room = room.name;
     currentRoom.onEnter();
 }
 
@@ -551,7 +552,16 @@ function onKeyPress(e) {
 
     if (e.code == 'KeyD') {
         isDebug = !isDebug;
+        if (isDebug) {
+            localStorage.debug = true;
+        } else {
+            delete localStorage.debug;
+        }
         console.log("Debug mode:", isDebug);
+    }
+    if (e.code === 'KeyR') {
+        delete localStorage.room
+        location.reload();
     }
 }
 
@@ -677,7 +687,7 @@ function initialize() {
                     P5.fill(255, 0, 0, 128)
                 }
 
-                P5.rect(h.boundingBox.x-2, h.boundingBox.y-2, h.boundingBox.width+4, h.boundingBox.height+4)
+                P5.rect(h.boundingBox.x - 2, h.boundingBox.y - 2, h.boundingBox.width + 4, h.boundingBox.height + 4)
                 P5.fill(200)
 
                 P5.textSize(16)
@@ -745,10 +755,18 @@ function initialize() {
     }
 
     // Set Start Room, or fall back to first room
-    let initialRoom = gameInfo.rooms.find(r => r.name == gameInfo.startRoom)
+    let initialRoom = null;
+    if (isDebug) {
+        initialRoom = gameInfo.rooms.find(r => r.name == localStorage.room);
+    }
     if (!initialRoom) {
+        initialRoom = gameInfo.rooms.find(r => r.name == gameInfo.startRoom)        
+    }
+    if (!initialRoom) {
+        console.warn(`Start room '${gameInfo.startRoom}' not found. Falling back to first room.`)
         initialRoom = gameInfo.rooms[0]
     }
+
     setRoom(initialRoom)
 
     // Initialization complete
