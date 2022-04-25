@@ -677,7 +677,7 @@ function initialize() {
                     P5.fill(255, 0, 0, 128)
                 }
 
-                P5.rect(h.boundingBox.x, h.boundingBox.y, h.boundingBox.width, h.boundingBox.height)
+                P5.rect(h.boundingBox.x-2, h.boundingBox.y-2, h.boundingBox.width+4, h.boundingBox.height+4)
                 P5.fill(200)
 
                 P5.textSize(16)
