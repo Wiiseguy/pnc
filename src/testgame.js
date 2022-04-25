@@ -51,6 +51,7 @@ SOUND("bg", require("url:./data/chill.mp3"), { volume: 0.3 }) // Credit: https:/
 // Global vars
 let fridgeOpen = false
 let closetLightsOn = false
+let hasTestActorMoved = false
 let gotCheese = false
 let gotPipeWrentch = false
 let gotBox = false
@@ -112,7 +113,7 @@ ROOM("Bedroom", () => {
         of the mousehole with cheese to scare TestActor out of the room.
 */
 ROOM("Hallway_Left", () => {
-    let hasTestActorMoved = false
+    
 
     BACKGROUND("Hallway_LeftBG")
 
@@ -133,7 +134,7 @@ ROOM("Hallway_Left", () => {
     ACTOR("Shelf", {
         x: 67,
         y: 219,
-        image: "Shelf"
+        image: "Shelf"        
     })
 
     ACTOR("Cheese", {
@@ -367,6 +368,16 @@ ROOM("KitchenRoom", () => {
         visible: false
     })
 
+    ACTOR("TestActor", {
+        x: 540,
+        y: 110,
+        image: "TestActor",
+        visible: false,
+        behaviors: {
+            Jitter: {}
+        }
+    })
+
     CLICK("gotoHallway_Right", () => {
         GOTO("Hallway_Right")
     })
@@ -395,6 +406,9 @@ ROOM("KitchenRoom", () => {
 
     ENTER(() => {
         //PLAYSOUND("kitchen")
+        if (hasTestActorMoved) {
+            SHOWACTOR("TestActor")
+        }
     })
 })
 
@@ -412,6 +426,12 @@ BEHAVIOR('BouncyBall', {
             actor.y = 0;
             actor.ySpeed = -(actor.ySpeed * 0.5);
         }
+    }
+})
+
+BEHAVIOR('Jitter', {
+    update(actor, p5, gameInfo) {
+        actor.offsetX = -2 + Math.random() * 4;
     }
 })
 

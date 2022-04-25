@@ -73,6 +73,8 @@ export class GameObject {
 
     fade: number = 1;
     scale: number = 1;
+    offsetX: number = 0;
+    offsetY: number = 0;
 
     rotation: number = 0;
     rotateSpeed: number = 0;

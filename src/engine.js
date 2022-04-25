@@ -458,6 +458,7 @@ function drawActor(actor) {
         let centerY = actor.image.height / 2;
         P5.push();
         P5.translate(actor.x + centerX, actor.y + centerY)
+        P5.translate(actor.offsetX, actor.offsetY)
         P5.rotate(actor.rotation * D_PI)
         P5.translate(-centerX, -centerY)
         let sx = actor.image.sx;
