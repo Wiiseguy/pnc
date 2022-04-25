@@ -81,15 +81,15 @@ globalThis.ACTOR = function (name, def) {
     // Handle behaviors
     let behaviors = [];
     if (def.behaviors) {
-        Object.entries(def.behaviors).forEach(([behaviorName, behavior]) => {
+        Object.entries(def.behaviors).forEach(([behaviorName, options]) => {
             let behaviorDef = gameInfo.behaviors.find(behaviorDef => behaviorDef.name === behaviorName);
             if (!behaviorDef) {
                 console.warn(`[ACTOR] Behavior ${behaviorName} not found`);
                 return;
             }
-            behaviors.push({ name: behaviorName, options: behavior, behavior: behaviorDef });
+            behaviors.push({ name: behaviorName, options: options, behavior: behaviorDef });
             if (behaviorDef.state) {
-                Object.assign(actor, behaviorDef.state())
+                Object.assign(actor, behaviorDef.state(), options)
             }
         });
     }

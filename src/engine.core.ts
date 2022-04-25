@@ -60,6 +60,12 @@ export class GameObject {
         this._y = value;
         this.boundingBox.y = value;
     }
+    get height() {
+        return this.boundingBox.height;
+    }
+    get width() {
+        return this.boundingBox.width;
+    }
     xSpeed: number = 0;
     ySpeed: number = 0;
     friction: number = 0;

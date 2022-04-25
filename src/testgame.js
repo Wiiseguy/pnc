@@ -130,29 +130,6 @@ ROOM("Hallway_Left", () => {
         image: "TestActor"
     })
 
-    ACTOR("Fidget", {
-        x: 370,
-        y: 20,
-        image: "TestSprite",
-        rotation: 0,
-        //gravity: 0.1,
-        behaviors: {
-            drag: {
-                // Drag options
-            }
-        }
-    })
-
-    ACTOR("bats", {
-        x: 470,
-        y: 40,
-        image: "AnimatedBats",
-        rotation: 0,
-        behaviors: {
-            drag: {}
-        }
-    })
-
     ACTOR("Shelf", {
         x: 67,
         y: 219,
@@ -166,9 +143,35 @@ ROOM("Hallway_Left", () => {
         visible: false
     })
 
-    CLICK("Fidget", fidget => {
-        fidget.rotateSpeed += 10;
-        fidget.rotateFriction = 0.2;
+    ACTOR("Fidget", {
+        x: 370,
+        y: 20,
+        image: "TestSprite",
+        rotation: 0,
+        gravity: 0.5,
+        friction: 0.05,
+        behaviors: {
+            drag: {
+                // Drag options
+                momentum: true
+            },
+            BouncyBall: {}
+        }
+    })
+
+    ACTOR("bats", {
+        x: 470,
+        y: 40,
+        image: "AnimatedBats",
+        rotation: 0,
+        behaviors: {
+            drag: {}
+        }
+    })
+
+    CLICK("bats", bats => {
+        bats.rotateSpeed += 10;
+        bats.rotateFriction = 0.2;
     })
 
     CLICK("TestActor", () => {
@@ -395,16 +398,34 @@ ROOM("KitchenRoom", () => {
     })
 })
 
+BEHAVIOR('BouncyBall', {
+    update(actor, p5, gameInfo) {
+        if (actor.y + actor.height > gameInfo.height) {
+            actor.y = gameInfo.height - actor.height + 1;
+            actor.ySpeed = -(actor.ySpeed * 0.5);
+        }
+        if (actor.x + actor.width > gameInfo.width || actor.x < 0) {
+            actor.x = p5.constrain(actor.x, 0, gameInfo.width - actor.width);
+            actor.xSpeed = -(actor.xSpeed * 0.5);
+        }
+        if(actor.y < 0) {
+            actor.y = 0;
+            actor.ySpeed = -(actor.ySpeed * 0.5);
+        }
+    }
+})
+
 BEHAVIOR('drag', {
     state() {
         return {
             isDragging: false,
             dragStartX: 0,
             dragStartY: 0,
+            prevX: 0,
+            prevY: 0,
+            steps: 0,
+            momentum: false
         }
-    },
-    create() {
-
     },
     /**
      * 
@@ -413,6 +434,7 @@ BEHAVIOR('drag', {
      * @param {GameInfo} gameInfo 
      */
     update(actor, p5, gameInfo) {
+        let wasDragging = actor.isDragging;
         if (p5.mouseIsPressed) {
             if (actor.boundingBox.contains(p5.mouseX, p5.mouseY) && !gameInfo._isDragging) {   // gameInfo check is to prevent other objects from being dragged              
                 if (!actor.isDragging) {
@@ -430,9 +452,25 @@ BEHAVIOR('drag', {
         if (actor.isDragging) {
             actor.x = p5.mouseX - actor.dragStartX;
             actor.y = p5.mouseY - actor.dragStartY;
+            actor.ySpeed = 0;
+        }
+
+        if (!actor.isDragging && wasDragging && actor.momentum) {
+            actor.xSpeed = (actor.x - actor.prevX) * 0.5;
+            actor.ySpeed = (actor.y - actor.prevY) * 0.5;
+        }
+
+        // Have to do it like this, because x-prevX (and y-prevY) was always 0 on stop dragging
+        actor.steps++;
+        if (actor.steps > 5) {
+            actor.prevX = actor.x;
+            actor.prevY = actor.y;
+            actor.steps = 0;
         }
     }
 })
+
+
 
 // // Custom test
 // let radius = 50;
