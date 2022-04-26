@@ -182,11 +182,20 @@ globalThis.BEHAVIOR = function (name, behavior) {
 globalThis.BACKGROUND = function (imageName) {
     currentRoomDef.background = imageName;
 }
+globalThis.COLOR = function (...args) {
+    currentRoomDef.bgColor = args;
+}
+globalThis.PREDRAW = function (fn) {
+    currentRoomDef.onBeforeDraw = fn;
+}
+globalThis.DRAW = function (fn) {
+    currentRoomDef.onDraw = fn;
+}
 globalThis.DESCRIPTION = function (desc) {
     currentRoomDef.description = desc;
 }
 globalThis.HOTSPOT = function (name, x1, y1, x2, y2) {
-    let actor = new GameActor(name, x1, y1, null, false);
+    let actor = new GameActor(name, x1, y1, null, true);
     actor.boundingBox = new BoundingBox(x1, y1, x2 - x1, y2 - y1);
     currentRoomDef.hotspots.push(actor);
 }
@@ -649,7 +658,7 @@ function initialize() {
     // Initialize rooms
     gameInfo.rooms.forEach(r => {
         currentRoomDef = r;
-        r.roomInitFn();
+        r.roomInitFn(context);
         if (r.background) {
             r.backgroundImage = getImage(r.background);
         }
@@ -684,11 +693,38 @@ function initialize() {
         }        
         
         // Draw Background
-        if (currentRoom.backgroundImage) {
-            P5.image(currentRoom.backgroundImage.image, 0, 0)
+        if (currentRoom.bgColor) {
+            P5.background(currentRoom.bgColor);
         } else {
             P5.background(gameInfo.bgColor)
         }
+        if (currentRoom.backgroundImage) {
+            P5.image(currentRoom.backgroundImage.image, 0, 0)
+        }
+        if (currentRoom.onBeforeDraw) {
+            P5.push();
+            currentRoom.onBeforeDraw(context, currentRoom);
+            P5.pop();
+        }
+
+        // Determine cursor
+        let hovering = false;
+        [...currentRoom.actors, ...currentRoom.hotspots].forEach(h => {
+            if (!h.visible) return;
+            if (h.actions.some(a => a.name === currentVerb || a.name === '*') && h.boundingBox.contains(P5.mouseX, P5.mouseY)) {
+                hovering = true;
+            }          
+        })
+        if (isActionRunning) {
+            P5.cursor('none');
+            //P5.cursor('wait'); // Show spinning cursor
+        }
+        else if (hovering && !isActionRunning) {
+            P5.cursor('pointer');
+        }
+        else {
+            P5.cursor('default');
+        }        
 
         if (isDebug) {
             // Draw Actor hotspots
@@ -709,10 +745,6 @@ function initialize() {
 
                 P5.rect(h.boundingBox.x - 2, h.boundingBox.y - 2, h.boundingBox.width + 4, h.boundingBox.height + 4)
                 P5.fill(200)
-
-                P5.textSize(16)
-                P5.textAlign("right", "bottom")
-                P5.text(h.name, h.x2, h.y2)
                 P5.pop()
             })
             // Draw Hotspots
@@ -752,6 +784,13 @@ function initialize() {
         gameInfo.customDraw.forEach(fn => {
             fn(context)
         })
+
+        // Call current room's custom draw function
+        if (currentRoom.onDraw) {
+            P5.push();
+            currentRoom.onDraw(context, currentRoom);
+            P5.pop();
+        }
 
         // Draw current text
         if (currentText) {

@@ -5,10 +5,12 @@ AUTHOR("Chronic")
 AUTHOR("Wiiseguy")
 SIZE(640, 400)
 FONTSIZE(24)
-RENDER('3d')
+BGCOLOR('#ff00ff')
+//RENDER('3d')
+
 //DEBUG()
 //NOINTRO()
-BGCOLOR('#ff00ff')
+
 
 STARTROOM("Hallway_Left")
 //STARTROOM("Bedroom")
@@ -176,6 +178,10 @@ ROOM("Hallway_Left", () => {
     CLICK("bats", bats => {
         bats.rotateSpeed += 10;
         bats.rotateFriction = 0.2;
+    })
+
+    CLICK('Shelf', shelf => {
+        GOTO('TestRoom')
     })
 
     CLICK("TestActor", () => {
@@ -424,19 +430,78 @@ ROOM("KitchenRoom", () => {
     })
 })
 
+ROOM("TestRoom", (ctx) => {
+    let { gameInfo, p5 } = ctx;
+    let score = 0;
+
+    COLOR("#aabbff")
+    //COLOR(0,0,255)
+
+    ACTOR('Back', {
+        x: gameInfo.width - 100,
+        y: 0,
+        width: 100,
+        height: 50
+    })
+    CLICK('Back', _ => {
+        GOTO('Hallway_Left')
+    })
+
+    for (let i = 0; i < 10; i++) {
+        ACTOR("Ball" + i, {
+            x: Math.random() * gameInfo.width,
+            y: Math.random() * gameInfo.height,
+            image: "TestSprite",
+            rotation: 0,
+            //rotateSpeed: -1 + Math.random() * 2,
+            xSpeed: p5.random(-3, 3),
+            ySpeed: p5.random(-3, 3),
+            behaviors: {
+                BouncyBall: {
+                    bounciness: 1
+                }
+            }
+        })
+    }
+
+    // PREDRAW(ctx => {
+    //     let { p5, canvas } = ctx;
+    //     p5.noStroke();
+    //     p5.fill(0, 255, 0)
+    //     p5.rect(p5.mouseX, 0, 32, canvas.height)
+    // })
+
+    DRAW(ctx => {
+        let { p5, canvas } = ctx;
+        p5.noStroke();
+        p5.fill(0, 0, 0, 255)
+        p5.text(`Score: ${score}`, 0, 10, canvas.width, 32)
+
+        
+        p5.fill(0, 0, 0, 128)
+        p5.text("Back", canvas.width-100, 10, 100, 32)
+    })
+    
+})
+
 BEHAVIOR('BouncyBall', {
+    state() {
+        return {
+            bounciness: 0.5
+        }
+    },
     update(actor, p5, gameInfo) {
         if (actor.y + actor.height > gameInfo.height) {
-            actor.y = gameInfo.height - actor.height + 1;
-            actor.ySpeed = -(actor.ySpeed * 0.5);
+            actor.y = gameInfo.height - actor.height - actor.bounciness + 1; // Honestly just trial and error..
+            actor.ySpeed = -(actor.ySpeed * actor.bounciness);
         }
         if (actor.x + actor.width > gameInfo.width || actor.x < 0) {
             actor.x = p5.constrain(actor.x, 0, gameInfo.width - actor.width);
-            actor.xSpeed = -(actor.xSpeed * 0.5);
+            actor.xSpeed = -(actor.xSpeed * actor.bounciness);
         }
         if(actor.y < 0) {
             actor.y = 0;
-            actor.ySpeed = -(actor.ySpeed * 0.5);
+            actor.ySpeed = -(actor.ySpeed * actor.bounciness);
         }
     }
 })

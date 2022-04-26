@@ -9,7 +9,7 @@
     "test": "aqa *.tests.js",
     "test:watch": "aqa *.tests.js --watch",
     "run-dev": "parcel src/test.html --no-cache --open",
-    "build": "parcel build src/test.html",
+    "build": "parcel build src/test.html --public-url ./",
     "install-packages": "npm i"
   },
   "repository": {
