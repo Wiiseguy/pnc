@@ -42,8 +42,10 @@ IMAGE("Cheese", require('url:./data/TestAdv/KitchenRoom/Cheese.png'))
 IMAGE("BatStrip", require('url:./data/bat_strip.png'))
 
 // Sound effects and stuff
-SOUND("TestActorScream", require("url:./data/TestAdv/Hallway_Left/scream.wav"))
-
+SOUND("TestActorScream", require("url:./data/scream.wav"))
+SOUND("clue", require("url:./data/sfx-clue.wav"), { volume: 0.5})
+SOUND("thud", require("url:./data/thud1.wav"))
+SOUND("move", require("url:./data/thud2.wav"))
 SOUND("menu", require("url:./data/menu.wav"))
 SOUND("kitchen", require("url:./data/62215.wav"))
 SOUND("bg", require("url:./data/chill.mp3"), { volume: 0.3 }) // Credit: https://www.looperman.com/loops/detail/289801/lenoxbeatmaker-sativaskunk-free-146bpm-jazz-electric-guitar-loop
@@ -249,10 +251,13 @@ ROOM("Hallway_Right", () => {
 
         if (!painting.fallen) {
             painting.fallen = true
+            PLAYSOUND('move')
             MOVEACTOR("Painting", painting.x + 10, painting.y, 100, true)
             MOVEACTOR("Painting", painting.initialX, painting.initialY, 100, true)
             MOVEACTOR("Painting", 189, 185, 800, true, { easing: 'easeInQuart' })
+            PLAYSOUND('thud')
             SHOWTEXT("Whoops!")
+            PLAYSOUND('clue')
         } else {
             painting.fallen = false
             MOVEACTOR("Painting", painting.initialX, painting.initialY, 800, true)
@@ -387,6 +392,7 @@ ROOM("KitchenRoom", () => {
     })
 
     CLICK("FridgeDoorClosed", () => {
+        PLAYSOUND('move', { volume: 0.5, rate: 1.2 })
         HIDEACTOR("FridgeDoorClosed")
         SHOWACTOR("FridgeDoorOpen")
         if (!gotCheese) {
@@ -396,6 +402,7 @@ ROOM("KitchenRoom", () => {
     })
 
     CLICK("FridgeDoorOpen", () => {
+        PLAYSOUND('thud', { volume: 0.25, rate: 0.5 })
         HIDEACTOR("FridgeDoorOpen")
         SHOWACTOR("FridgeDoorClosed")
         HIDEACTOR("Cheese")
@@ -405,6 +412,7 @@ ROOM("KitchenRoom", () => {
     VERB('use', "Cheese", () => {
         SHOWTEXT("This puzzle is so cheesy..")
         HIDEACTOR("Cheese")
+        PLAYSOUND('clue')
         gotCheese = true
     })
 
