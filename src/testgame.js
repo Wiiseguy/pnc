@@ -412,7 +412,6 @@ ROOM("KitchenRoom", () => {
     VERB('use', "Cheese", () => {
         SHOWTEXT("This puzzle is so cheesy..")
         HIDEACTOR("Cheese")
-        PLAYSOUND('clue')
         gotCheese = true
     })
 
