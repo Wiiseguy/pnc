@@ -4,7 +4,8 @@ NAME("PNC Test Adventure")
 AUTHOR("Chronic")
 AUTHOR("Wiiseguy")
 SIZE(640, 400)
-FONTSIZE(32)
+FONTSIZE(24)
+RENDER('3d')
 //DEBUG()
 //NOINTRO()
 BGCOLOR('#ff00ff')
@@ -194,14 +195,14 @@ ROOM("Hallway_Left", () => {
             SHOWACTOR("Mouse")
             WAIT(500)
 
-            SHOWTEXT("🐭")
+            SHOWTEXT("🐭") // Doesn't render in 3d mode
             PLAYSOUND("TestActorScream")
             SHOWTEXT("AHH! A MOUSE!!")
             MOVEACTOR("TestActor", 700, 160, 1000, true, { easing: 'easeInElastic(1, .6)' })
             hasTestActorMoved = true
         }
         else {
-            SHOWTEXT("I hear something moving around in there.")
+            SHOWTEXT("I hear something moving around in there. I hear something moving around in there. I hear something moving around in there.")
         }
     })
 

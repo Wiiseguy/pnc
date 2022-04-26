@@ -26,6 +26,9 @@ let isActionRunning = false;
 
 let currentText = '';
 
+let renderMode = '2d';
+let font;
+
 globalThis.NAME = function (name) {
     gameInfo.name = name;
 }
@@ -46,6 +49,13 @@ globalThis.DEBUG = function () {
 globalThis.SIZE = function (width, height) {
     gameInfo.width = width
     gameInfo.height = height
+}
+
+globalThis.RENDER = function (mode) {
+    if (mode !== '2d' && mode !== '3d') {
+        throw new Error('RENDER: Invalid mode. Must be either "2d" or "3d"');
+    }
+    renderMode = mode;
 }
 
 globalThis.FONTSIZE = function (size) {
@@ -569,7 +579,12 @@ function onKeyPress(e) {
 function initialize() {
     console.log("GameInfo:", gameInfo)
 
-    const canvas = P5.createCanvas(gameInfo.width, gameInfo.height);
+    let p5RenderMode = renderMode === '3d' ? P5.WEBGL : P5.P2D;
+    const canvas = P5.createCanvas(gameInfo.width, gameInfo.height, p5RenderMode);    
+
+    if (renderMode === '3d') {
+        P5.textFont(font);
+    }
 
     // Bind DOM events
     P5.keyPressed = onKeyPress;
@@ -664,6 +679,10 @@ function initialize() {
     })
 
     P5.draw = _ => {
+        if (renderMode === '3d') {
+            P5.translate(-gameInfo.width / 2, -gameInfo.height / 2);
+        }        
+        
         // Draw Background
         if (currentRoom.backgroundImage) {
             P5.image(currentRoom.backgroundImage.image, 0, 0)
@@ -735,9 +754,15 @@ function initialize() {
         })
 
         // Draw current text
-        P5.push();
-        P5.text(currentText, 0, 0, gameInfo.width, gameInfo.height, "center", "bottom");
-        P5.pop();
+        if (currentText) {
+            P5.push();
+            P5.noStroke();
+            P5.fill(0, 0, 0, 180)
+            P5.rect(0, gameInfo.height - gameInfo.fontSize*4, gameInfo.width, gameInfo.fontSize*4);
+            P5.fill(255, 255, 255)
+            P5.text(currentText, gameInfo.fontSize, gameInfo.height - gameInfo.fontSize*4, gameInfo.width-(gameInfo.fontSize*2), gameInfo.fontSize*4, "center", "bottom");
+            P5.pop();
+        }
 
         // Temp, draw current verb, etc.
         if (isDebug) {
@@ -776,6 +801,11 @@ function initialize() {
 
 P5.preload = function () {
     console.log("Preload")
+
+    if (renderMode === '3d') {
+        font = P5.loadFont(require('url:./data/Swansea.ttf'));
+    }
+    
 
     // Preload images
     // by doing this inside p5's preload(), setup() won't be called until all assets are loaded
