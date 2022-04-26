@@ -95,7 +95,7 @@ ROOM("Bedroom", () => {
         // WAIT(500)
         // SHOWTEXT("Can someone fix that faucet dripping please?!!")
         // WAIT(1000)
-        // SHOWTEXT("i'M! TRYING! TO! SLEEP!")
+        // SHOWTEXT("I'M! TRYING! TO! SLEEP!")
         // WAIT(1000)
         // SHOWTEXT("DRIP....")
         SHOWTEXT("FINE! I'LL FIX IT MYSELF! UGH!")
@@ -333,14 +333,14 @@ ROOM("Closet", () => {
             }
         }
         else {
-            SHOWTEXT("There are a bunch of sharp things in there, i need to turn the light on first.")
+            SHOWTEXT("There are a bunch of sharp things in there, I need to turn the light on first.")
         }
     })
 
     CLICK("Light", () => {
         if (gotBox) {
             if (!closetLightsOn) {
-                SHOWTEXT("Maybe i can use this box to stand on.")
+                SHOWTEXT("Maybe I can use this box to stand on.")
                 SHOWACTOR("Box")
                 WAIT(500)
                 HIDEACTOR("ClosetShadow")
@@ -348,7 +348,7 @@ ROOM("Closet", () => {
             }
         }
         else {
-            SHOWTEXT("I cannot reach the light, i need something to stand on.")
+            SHOWTEXT("I cannot reach the light, I need something to stand on.")
         }
     })
 
