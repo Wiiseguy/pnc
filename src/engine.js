@@ -709,10 +709,12 @@ function initialize() {
 
         // Determine cursor
         let hovering = false;
+        let hoveringObject = null;
         [...currentRoom.actors, ...currentRoom.hotspots].forEach(h => {
             if (!h.visible) return;
             if (h.actions.some(a => a.name === currentVerb || a.name === '*') && h.boundingBox.contains(P5.mouseX, P5.mouseY)) {
                 hovering = true;
+                console.log(h.mousepointer)
             }          
         })
         if (isActionRunning) {
@@ -720,10 +722,11 @@ function initialize() {
             //P5.cursor('wait'); // Show spinning cursor
         }
         else if (hovering && !isActionRunning) {
-            P5.cursor('pointer');
+            P5.cursor(require('url:./data/TestAdv/cur_pointer.png'))
         }
         else {
-            P5.cursor('default');
+            P5.cursor(require('url:./data/TestAdv/cur_pointer.png'))
+            
         }        
 
         if (isDebug) {

@@ -102,8 +102,9 @@ export class GameActor extends GameObject {
     image: P5.Image;
     visible: boolean;
     alpha: number;
+    mousepointer: string;
     behaviors = [];
-    constructor(name: string, x: number, y: number, imageName: string, visible: boolean) {
+    constructor(name: string, x: number, y: number, imageName: string, visible: boolean, mousepointer: string) {
         super();
         this.name = name;
         this.initialX = x;
@@ -113,6 +114,7 @@ export class GameActor extends GameObject {
         this.imageName = imageName;
         this.actions = [];
         this.visible = visible ?? true;
+        this.mousepointer = mousepointer;
     }
 }
 

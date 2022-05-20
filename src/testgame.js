@@ -12,8 +12,8 @@ BGCOLOR('#ff00ff')
 //NOINTRO()
 
 
-STARTROOM("Hallway_Left")
-//STARTROOM("Bedroom")
+//STARTROOM("Hallway_Left")
+STARTROOM("Bedroom")
 
 // Room - Bedroom
 IMAGE("BedroomBG", require('url:./data/TestAdv/Bedroom/Bedroom.png'))
@@ -42,16 +42,21 @@ IMAGE("FridgeDoorClosed", require('url:./data/TestAdv/KitchenRoom/FridgeDoorClos
 IMAGE("FridgeDoorOpen", require('url:./data/TestAdv/KitchenRoom/FridgeDoorOpen.png'))
 IMAGE("Cheese", require('url:./data/TestAdv/KitchenRoom/Cheese.png'))
 
-IMAGE("BatStrip", require('url:./data/bat_strip.png'))
+IMAGE("BatStrip", require('url:./data/TestAdv/SFX/bat_strip.png'))
 
 // Sound effects and stuff
-SOUND("TestActorScream", require("url:./data/scream.wav"))
-SOUND("clue", require("url:./data/sfx-clue.wav"), { volume: 0.5})
-SOUND("thud", require("url:./data/thud1.wav"))
-SOUND("move", require("url:./data/thud2.wav"))
-SOUND("menu", require("url:./data/menu.wav"))
-SOUND("kitchen", require("url:./data/62215.wav"))
-SOUND("bg", require("url:./data/chill.mp3"), { volume: 0.3 }) // Credit: https://www.looperman.com/loops/detail/289801/lenoxbeatmaker-sativaskunk-free-146bpm-jazz-electric-guitar-loop
+SOUND("TestActorScream", require("url:./data/TestAdv/SFX/scream.wav"))
+SOUND("clue", require("url:./data/TestAdv/SFX/sfx-clue.wav"), { volume: 0.5})
+SOUND("thud", require("url:./data/TestAdv/SFX/thud1.wav"))
+SOUND("move", require("url:./data/TestAdv/SFX/thud2.wav"))
+SOUND("menu", require("url:./data/TestAdv/SFX/menu.wav"))
+SOUND("kitchen", require("url:./data/TestAdv/SFX/62215.wav"))
+SOUND("bg", require("url:./data/TestAdv/SFX/chill.mp3"), { volume: 0.3 }) // Credit: https://www.looperman.com/loops/detail/289801/lenoxbeatmaker-sativaskunk-free-146bpm-jazz-electric-guitar-loop
+
+// Mouse Pointers
+IMAGE("cur_pointer", require('url:./data/TestAdv/cur_pointer.png'))
+IMAGE("cur_walk", require('url:./data/TestAdv/cur_walk.png'))
+
 
 // Global vars
 let fridgeOpen = false
@@ -79,7 +84,8 @@ ROOM("Bedroom", () => {
     ACTOR("Box", {
         x: 478,
         y: 335,
-        image: "Box"
+        image: "Box",
+        mousepointer: "cur_pointer"
     })
 
 
@@ -98,7 +104,7 @@ ROOM("Bedroom", () => {
         // SHOWTEXT("I'M! TRYING! TO! SLEEP!")
         // WAIT(1000)
         // SHOWTEXT("DRIP....")
-        SHOWTEXT("FINE! I'LL FIX IT MYSELF! UGH!")
+        //SHOWTEXT("FINE! I'LL FIX IT MYSELF! UGH!")
     })
 
     CLICK("gotoHallway_Right", () => {
