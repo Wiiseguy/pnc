@@ -56,6 +56,7 @@ SOUND("bg", require("url:./data/TestAdv/SFX/chill.mp3"), { volume: 0.3 }) // Cre
 // Mouse Pointers
 IMAGE("cur_pointer", require('url:./data/TestAdv/cur_pointer.png'))
 IMAGE("cur_walk", require('url:./data/TestAdv/cur_walk.png'))
+IMAGE("cur_pickup", require('url:./data/TestAdv/cur_pickup.png'))
 
 
 // Global vars
@@ -85,7 +86,7 @@ ROOM("Bedroom", () => {
         x: 478,
         y: 335,
         image: "Box",
-        mousepointer: "cur_pointer"
+        mousepointer: "cur_pickup"
     })
 
 

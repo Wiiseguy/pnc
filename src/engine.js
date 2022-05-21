@@ -87,6 +87,7 @@ globalThis.ACTOR = function (name, def) {
     actor.alpha = def.alpha ?? 255;
     actor.initialWidth = def.width;
     actor.initialHeight = def.height;
+    actor.mousepointer = def.mousepointer;
 
     // Handle behaviors
     let behaviors = [];
@@ -714,7 +715,7 @@ function initialize() {
             if (!h.visible) return;
             if (h.actions.some(a => a.name === currentVerb || a.name === '*') && h.boundingBox.contains(P5.mouseX, P5.mouseY)) {
                 hovering = true;
-                console.log(h.mousepointer)
+                hoveringObject = h;
             }          
         })
         if (isActionRunning) {
@@ -722,11 +723,10 @@ function initialize() {
             //P5.cursor('wait'); // Show spinning cursor
         }
         else if (hovering && !isActionRunning) {
-            P5.cursor(require('url:./data/TestAdv/cur_pointer.png'))
+            console.log(hoveringObject.mousepointer)
         }
         else {
-            P5.cursor(require('url:./data/TestAdv/cur_pointer.png'))
-            
+            P5.cursor(require('url:./data/TestAdv/cur_pointer.png')) 
         }        
 
         if (isDebug) {
