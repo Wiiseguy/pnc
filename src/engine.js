@@ -718,12 +718,13 @@ function initialize() {
                 hoveringObject = h;
             }          
         })
+
         if (isActionRunning) {
             P5.cursor('none');
             //P5.cursor('wait'); // Show spinning cursor
         }
-        else if (hovering && !isActionRunning) {
-            console.log(hoveringObject.mousepointer)
+        else if (hovering && hoveringObject?.mousepointer) {
+            P5.cursor(getImage(hoveringObject.mousepointer).fileName);
         }
         else {
             P5.cursor(require('url:./data/TestAdv/cur_pointer.png')) 
